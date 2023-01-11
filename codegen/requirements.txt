@@ -1,0 +1,2 @@
+aas-core-codegen@git+https://github.com/aas-core-works/aas-core-codegen@18ee84f#egg=aas-core-codegen
+aas-core-meta@git+https://github.com/aas-core-works/aas-core-meta@2227695#egg=aas-core-meta
