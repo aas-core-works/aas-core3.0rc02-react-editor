@@ -58,3 +58,8 @@ div.aas-field {
     display: flex;
     vertical-align: top;
 }
+
+span.aas-error-path {
+    color: red;
+    margin-right: 5em;
+}

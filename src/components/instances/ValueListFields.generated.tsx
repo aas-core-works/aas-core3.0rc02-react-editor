@@ -13,8 +13,8 @@ import * as aas from "@aas-core-works/aas-core3.0rc02-typescript";
 import * as React from "react";
 
 import * as fields from '../fields';
-import * as newinstancing from '../../newinstancing.generated';
 import * as help from './help.generated';
+import * as newinstancing from '../../newinstancing.generated';
 
 export function ValueListFields(
   props: {
@@ -29,10 +29,10 @@ export function ValueListFields(
         helpUrl={
           `${help.ROOT_URL}/Value_list.html#property-value_reference_pairs`
         }
+        parent={props.instance}
+        property="valueReferencePairs"
         newInstanceDefinitions={
-          newinstancing.forValueReferencePair(
-            props.instance
-          )
+          newinstancing.FOR_VALUE_REFERENCE_PAIR
         }
         snapItems={
           props.snapInstance.valueReferencePairs

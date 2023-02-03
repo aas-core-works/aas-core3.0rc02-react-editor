@@ -13,8 +13,8 @@ import * as aas from "@aas-core-works/aas-core3.0rc02-typescript";
 import * as React from "react";
 
 import * as fields from '../fields';
-import * as newinstancing from '../../newinstancing.generated';
 import * as help from './help.generated';
+import * as newinstancing from '../../newinstancing.generated';
 
 export function QualifierFields(
   props: {
@@ -29,6 +29,8 @@ export function QualifierFields(
         helpUrl={
           `${help.ROOT_URL}/Qualifier.html#property-semantic_id`
         }
+        parent={props.instance}
+        property="semanticId"
         snapInstance={
           props.snapInstance.semanticId
         }
@@ -36,9 +38,7 @@ export function QualifierFields(
           props.instance.semanticId
         }
         newInstanceDefinitions={
-          newinstancing.forReference(
-            props.instance
-          )
+          newinstancing.FOR_REFERENCE
         }
         setInstance={
           (instance) => {
@@ -52,10 +52,10 @@ export function QualifierFields(
         helpUrl={
           `${help.ROOT_URL}/Qualifier.html#property-supplemental_semantic_ids`
         }
+        parent={props.instance}
+        property="supplementalSemanticIds"
         newInstanceDefinitions={
-          newinstancing.forReference(
-            props.instance
-          )
+          newinstancing.FOR_REFERENCE
         }
         snapItems={
           props.snapInstance.supplementalSemanticIds
@@ -131,6 +131,8 @@ export function QualifierFields(
         helpUrl={
           `${help.ROOT_URL}/Qualifier.html#property-value_id`
         }
+        parent={props.instance}
+        property="valueId"
         snapInstance={
           props.snapInstance.valueId
         }
@@ -138,9 +140,7 @@ export function QualifierFields(
           props.instance.valueId
         }
         newInstanceDefinitions={
-          newinstancing.forReference(
-            props.instance
-          )
+          newinstancing.FOR_REFERENCE
         }
         setInstance={
           (instance) => {

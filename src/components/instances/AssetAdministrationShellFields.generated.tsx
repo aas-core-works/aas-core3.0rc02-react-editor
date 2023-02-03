@@ -13,8 +13,8 @@ import * as aas from "@aas-core-works/aas-core3.0rc02-typescript";
 import * as React from "react";
 
 import * as fields from '../fields';
-import * as newinstancing from '../../newinstancing.generated';
 import * as help from './help.generated';
+import * as newinstancing from '../../newinstancing.generated';
 
 export function AssetAdministrationShellFields(
   props: {
@@ -29,10 +29,10 @@ export function AssetAdministrationShellFields(
         helpUrl={
           `${help.ROOT_URL}/Asset_administration_shell.html#property-extensions`
         }
+        parent={props.instance}
+        property="extensions"
         newInstanceDefinitions={
-          newinstancing.forExtension(
-            props.instance
-          )
+          newinstancing.FOR_EXTENSION
         }
         snapItems={
           props.snapInstance.extensions
@@ -78,10 +78,10 @@ export function AssetAdministrationShellFields(
         helpUrl={
           `${help.ROOT_URL}/Asset_administration_shell.html#property-display_name`
         }
+        parent={props.instance}
+        property="displayName"
         newInstanceDefinitions={
-          newinstancing.forLangString(
-            props.instance
-          )
+          newinstancing.FOR_LANG_STRING
         }
         snapItems={
           props.snapInstance.displayName
@@ -101,10 +101,10 @@ export function AssetAdministrationShellFields(
         helpUrl={
           `${help.ROOT_URL}/Asset_administration_shell.html#property-description`
         }
+        parent={props.instance}
+        property="description"
         newInstanceDefinitions={
-          newinstancing.forLangString(
-            props.instance
-          )
+          newinstancing.FOR_LANG_STRING
         }
         snapItems={
           props.snapInstance.description
@@ -137,6 +137,8 @@ export function AssetAdministrationShellFields(
         helpUrl={
           `${help.ROOT_URL}/Asset_administration_shell.html#property-administration`
         }
+        parent={props.instance}
+        property="administration"
         snapInstance={
           props.snapInstance.administration
         }
@@ -144,9 +146,7 @@ export function AssetAdministrationShellFields(
           props.instance.administration
         }
         newInstanceDefinitions={
-          newinstancing.forAdministrativeInformation(
-            props.instance
-          )
+          newinstancing.FOR_ADMINISTRATIVE_INFORMATION
         }
         setInstance={
           (instance) => {
@@ -173,10 +173,10 @@ export function AssetAdministrationShellFields(
         helpUrl={
           `${help.ROOT_URL}/Asset_administration_shell.html#property-embedded_data_specifications`
         }
+        parent={props.instance}
+        property="embeddedDataSpecifications"
         newInstanceDefinitions={
-          newinstancing.forEmbeddedDataSpecification(
-            props.instance
-          )
+          newinstancing.FOR_EMBEDDED_DATA_SPECIFICATION
         }
         snapItems={
           props.snapInstance.embeddedDataSpecifications
@@ -196,6 +196,8 @@ export function AssetAdministrationShellFields(
         helpUrl={
           `${help.ROOT_URL}/Asset_administration_shell.html#property-derived_from`
         }
+        parent={props.instance}
+        property="derivedFrom"
         snapInstance={
           props.snapInstance.derivedFrom
         }
@@ -203,9 +205,7 @@ export function AssetAdministrationShellFields(
           props.instance.derivedFrom
         }
         newInstanceDefinitions={
-          newinstancing.forReference(
-            props.instance
-          )
+          newinstancing.FOR_REFERENCE
         }
         setInstance={
           (instance) => {
@@ -219,6 +219,8 @@ export function AssetAdministrationShellFields(
         helpUrl={
           `${help.ROOT_URL}/Asset_administration_shell.html#property-asset_information`
         }
+        parent={props.instance}
+        property="assetInformation"
         snapInstance={
           props.snapInstance.assetInformation
         }
@@ -226,9 +228,7 @@ export function AssetAdministrationShellFields(
           props.instance.assetInformation
         }
         newInstanceDefinitions={
-          newinstancing.forAssetInformation(
-            props.instance
-          )
+          newinstancing.FOR_ASSET_INFORMATION
         }
         setInstance={
           (instance) => {
@@ -242,10 +242,10 @@ export function AssetAdministrationShellFields(
         helpUrl={
           `${help.ROOT_URL}/Asset_administration_shell.html#property-submodels`
         }
+        parent={props.instance}
+        property="submodels"
         newInstanceDefinitions={
-          newinstancing.forReference(
-            props.instance
-          )
+          newinstancing.FOR_REFERENCE
         }
         snapItems={
           props.snapInstance.submodels

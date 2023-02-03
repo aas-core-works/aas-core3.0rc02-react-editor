@@ -13,8 +13,8 @@ import * as aas from "@aas-core-works/aas-core3.0rc02-typescript";
 import * as React from "react";
 
 import * as fields from '../fields';
-import * as newinstancing from '../../newinstancing.generated';
 import * as help from './help.generated';
+import * as newinstancing from '../../newinstancing.generated';
 
 export function SubmodelFields(
   props: {
@@ -29,10 +29,10 @@ export function SubmodelFields(
         helpUrl={
           `${help.ROOT_URL}/Submodel.html#property-extensions`
         }
+        parent={props.instance}
+        property="extensions"
         newInstanceDefinitions={
-          newinstancing.forExtension(
-            props.instance
-          )
+          newinstancing.FOR_EXTENSION
         }
         snapItems={
           props.snapInstance.extensions
@@ -78,10 +78,10 @@ export function SubmodelFields(
         helpUrl={
           `${help.ROOT_URL}/Submodel.html#property-display_name`
         }
+        parent={props.instance}
+        property="displayName"
         newInstanceDefinitions={
-          newinstancing.forLangString(
-            props.instance
-          )
+          newinstancing.FOR_LANG_STRING
         }
         snapItems={
           props.snapInstance.displayName
@@ -101,10 +101,10 @@ export function SubmodelFields(
         helpUrl={
           `${help.ROOT_URL}/Submodel.html#property-description`
         }
+        parent={props.instance}
+        property="description"
         newInstanceDefinitions={
-          newinstancing.forLangString(
-            props.instance
-          )
+          newinstancing.FOR_LANG_STRING
         }
         snapItems={
           props.snapInstance.description
@@ -137,6 +137,8 @@ export function SubmodelFields(
         helpUrl={
           `${help.ROOT_URL}/Submodel.html#property-administration`
         }
+        parent={props.instance}
+        property="administration"
         snapInstance={
           props.snapInstance.administration
         }
@@ -144,9 +146,7 @@ export function SubmodelFields(
           props.instance.administration
         }
         newInstanceDefinitions={
-          newinstancing.forAdministrativeInformation(
-            props.instance
-          )
+          newinstancing.FOR_ADMINISTRATIVE_INFORMATION
         }
         setInstance={
           (instance) => {
@@ -188,6 +188,8 @@ export function SubmodelFields(
         helpUrl={
           `${help.ROOT_URL}/Submodel.html#property-semantic_id`
         }
+        parent={props.instance}
+        property="semanticId"
         snapInstance={
           props.snapInstance.semanticId
         }
@@ -195,9 +197,7 @@ export function SubmodelFields(
           props.instance.semanticId
         }
         newInstanceDefinitions={
-          newinstancing.forReference(
-            props.instance
-          )
+          newinstancing.FOR_REFERENCE
         }
         setInstance={
           (instance) => {
@@ -211,10 +211,10 @@ export function SubmodelFields(
         helpUrl={
           `${help.ROOT_URL}/Submodel.html#property-supplemental_semantic_ids`
         }
+        parent={props.instance}
+        property="supplementalSemanticIds"
         newInstanceDefinitions={
-          newinstancing.forReference(
-            props.instance
-          )
+          newinstancing.FOR_REFERENCE
         }
         snapItems={
           props.snapInstance.supplementalSemanticIds
@@ -234,10 +234,10 @@ export function SubmodelFields(
         helpUrl={
           `${help.ROOT_URL}/Submodel.html#property-qualifiers`
         }
+        parent={props.instance}
+        property="qualifiers"
         newInstanceDefinitions={
-          newinstancing.forQualifier(
-            props.instance
-          )
+          newinstancing.FOR_QUALIFIER
         }
         snapItems={
           props.snapInstance.qualifiers
@@ -257,10 +257,10 @@ export function SubmodelFields(
         helpUrl={
           `${help.ROOT_URL}/Submodel.html#property-embedded_data_specifications`
         }
+        parent={props.instance}
+        property="embeddedDataSpecifications"
         newInstanceDefinitions={
-          newinstancing.forEmbeddedDataSpecification(
-            props.instance
-          )
+          newinstancing.FOR_EMBEDDED_DATA_SPECIFICATION
         }
         snapItems={
           props.snapInstance.embeddedDataSpecifications
@@ -280,10 +280,10 @@ export function SubmodelFields(
         helpUrl={
           `${help.ROOT_URL}/Submodel.html#property-submodel_elements`
         }
+        parent={props.instance}
+        property="submodelElements"
         newInstanceDefinitions={
-          newinstancing.forSubmodelElement(
-            props.instance
-          )
+          newinstancing.FOR_SUBMODEL_ELEMENT
         }
         snapItems={
           props.snapInstance.submodelElements

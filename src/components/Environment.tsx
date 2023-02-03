@@ -2,6 +2,7 @@ import * as aas from "@aas-core-works/aas-core3.0rc02-typescript";
 import * as React from 'react';
 
 import * as instances from "./instances";
+import * as verification from "../verification"
 
 export function Environment(
   props: {

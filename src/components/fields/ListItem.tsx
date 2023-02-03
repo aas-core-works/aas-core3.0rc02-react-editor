@@ -9,7 +9,7 @@ export function ListItem<ClassT extends aas.types.Class>(
   props: {
     snapInstance: Readonly<ClassT>,
     instance: ClassT,
-    remove: (ourId: string) => void
+    remove: () => void
   }
 ) {
   return (
@@ -20,9 +20,7 @@ export function ListItem<ClassT extends aas.types.Class>(
 
           <button
             className="aas-remove-button"
-            onClick={() => {
-              props.remove(model.getOurId(props.snapInstance))
-            }}
+            onClick={() => props.remove()}
           >🗑
           </button>
         </summary>

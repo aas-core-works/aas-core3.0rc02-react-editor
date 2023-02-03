@@ -1,6 +1,7 @@
 import * as React from 'react'
 
 import * as emptory from "../emptory.generated"
+import * as enhancing from "../enhancing.generated";
 import * as model from "../model"
 import * as widgets from "./widgets"
 
@@ -25,9 +26,10 @@ export function NewButton(props: { state: model.State }) {
         message={dialogueMessage}
         onOk={
           () => {
-            props.state.environment = model.enhance(
+            props.state.environment = enhancing.enhance(
               emptory.newEnvironment(),
-              null
+              null,
+              []
             );
 
             props.state.fileName = model.INITIAL_FILENAME;

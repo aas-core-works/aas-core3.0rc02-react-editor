@@ -13,8 +13,8 @@ import * as aas from "@aas-core-works/aas-core3.0rc02-typescript";
 import * as React from "react";
 
 import * as fields from '../fields';
-import * as newinstancing from '../../newinstancing.generated';
 import * as help from './help.generated';
+import * as newinstancing from '../../newinstancing.generated';
 
 export function DataSpecificationPhysicalUnitFields(
   props: {
@@ -55,10 +55,10 @@ export function DataSpecificationPhysicalUnitFields(
         helpUrl={
           `${help.ROOT_URL}/Data_specification_physical_unit.html#property-definition`
         }
+        parent={props.instance}
+        property="definition"
         newInstanceDefinitions={
-          newinstancing.forLangString(
-            props.instance
-          )
+          newinstancing.FOR_LANG_STRING
         }
         snapItems={
           props.snapInstance.definition

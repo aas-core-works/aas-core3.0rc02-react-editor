@@ -38,8 +38,6 @@ export function BytesContainer(
     if (props.content !== null && props.contentType !== null) {
       const mimeType = mimetype.parse(props.contentType);
 
-      console.log('mimeType after parse is', mimeType)
-
       if (mimeType !== null) {
         const src = `data:${props.contentType};base64,${aas.common.base64Encode(props.content)}`;
 
@@ -58,7 +56,6 @@ export function BytesContainer(
           (mimeType.type === "text" && mimeType.subtype === "plain")
           || (mimeType.type == "application" && mimeType.subtype == "json")
         ) {
-          console.log(mimeType.parameters)
           const charsetParameter = mimeType.parameters.get("charset");
 
           const encoding =

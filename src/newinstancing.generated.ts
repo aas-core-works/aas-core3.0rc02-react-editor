@@ -21,13 +21,10 @@
 import * as aas from "@aas-core-works/aas-core3.0rc02-typescript";
 
 import * as emptory from "./emptory.generated";
-import * as model from "./model";
+import * as enhancing from "./enhancing.generated";
 
 /**
  * Define how to create a new instance of a class.
- *
- * @remarks
- * This definition is presumed in the context of a given parent instance.
  */
 export class Definition<ClassT extends aas.types.Class> {
   /**
@@ -43,12 +40,18 @@ export class Definition<ClassT extends aas.types.Class> {
   /**
    * Function to create an empty instance of the class
    */
-  factory: () => model.Enhanced<ClassT>;
+  factory: (
+    parent: aas.types.Class | null,
+    relativePathFromParent: Array<number | string>
+  ) => enhancing.Enhanced<ClassT>;
 
   constructor(
     label: string,
     isType: (instance: aas.types.Class) => boolean,
-    factory: () => model.Enhanced<ClassT>
+    factory: (
+      parent: aas.types.Class | null,
+      relativePathFromParent: Array<number | string>
+    ) => enhancing.Enhanced<ClassT>
   ) {
     this.label = label;
     this.isType = isType;
@@ -56,911 +59,472 @@ export class Definition<ClassT extends aas.types.Class> {
   }
 }
 
-export function forHasSemantics(
-  parent: aas.types.Class | null
-): Array<Definition<aas.types.IHasSemantics>> {
-  return [
-    new Definition(
-      "Relationship element",
-      aas.types.isRelationshipElement,
-      () => model.enhance(emptory.newRelationshipElement(), parent)
-    ),
-    new Definition(
-      "Annotated relationship element",
-      aas.types.isAnnotatedRelationshipElement,
-      () => model.enhance(emptory.newAnnotatedRelationshipElement(), parent)
-    ),
-    new Definition("Basic event element", aas.types.isBasicEventElement, () =>
-      model.enhance(emptory.newBasicEventElement(), parent)
-    ),
-    new Definition("Blob", aas.types.isBlob, () =>
-      model.enhance(emptory.newBlob(), parent)
-    ),
-    new Definition("Capability", aas.types.isCapability, () =>
-      model.enhance(emptory.newCapability(), parent)
-    ),
-    new Definition("Entity", aas.types.isEntity, () =>
-      model.enhance(emptory.newEntity(), parent)
-    ),
-    new Definition("Extension", aas.types.isExtension, () =>
-      model.enhance(emptory.newExtension(), parent)
-    ),
-    new Definition("File", aas.types.isFile, () =>
-      model.enhance(emptory.newFile(), parent)
-    ),
-    new Definition(
-      "Multi language property",
-      aas.types.isMultiLanguageProperty,
-      () => model.enhance(emptory.newMultiLanguageProperty(), parent)
-    ),
-    new Definition("Operation", aas.types.isOperation, () =>
-      model.enhance(emptory.newOperation(), parent)
-    ),
-    new Definition("Property", aas.types.isProperty, () =>
-      model.enhance(emptory.newProperty(), parent)
-    ),
-    new Definition("Qualifier", aas.types.isQualifier, () =>
-      model.enhance(emptory.newQualifier(), parent)
-    ),
-    new Definition("Range", aas.types.isRange, () =>
-      model.enhance(emptory.newRange(), parent)
-    ),
-    new Definition("Reference element", aas.types.isReferenceElement, () =>
-      model.enhance(emptory.newReferenceElement(), parent)
-    ),
-    new Definition("Specific asset id", aas.types.isSpecificAssetId, () =>
-      model.enhance(emptory.newSpecificAssetId(), parent)
-    ),
-    new Definition("Submodel", aas.types.isSubmodel, () =>
-      model.enhance(emptory.newSubmodel(), parent)
-    ),
-    new Definition(
-      "Submodel element collection",
-      aas.types.isSubmodelElementCollection,
-      () => model.enhance(emptory.newSubmodelElementCollection(), parent)
-    ),
-    new Definition(
-      "Submodel element list",
-      aas.types.isSubmodelElementList,
-      () => model.enhance(emptory.newSubmodelElementList(), parent)
-    ),
-  ];
-}
+export const FOR_EXTENSION = [
+  new Definition(
+    "Extension",
+    aas.types.isExtension,
+    (
+      parent: aas.types.Class | null,
+      relativePathFromParent: Array<number | string>
+    ) =>
+      enhancing.enhance(emptory.newExtension(), parent, relativePathFromParent)
+  ),
+];
 
-export function forExtension(
-  parent: aas.types.Class | null
-): Array<Definition<aas.types.Extension>> {
-  return [
-    new Definition("Extension", aas.types.isExtension, () =>
-      model.enhance(emptory.newExtension(), parent)
-    ),
-  ];
-}
+export const FOR_ADMINISTRATIVE_INFORMATION = [
+  new Definition(
+    "Administrative information",
+    aas.types.isAdministrativeInformation,
+    (
+      parent: aas.types.Class | null,
+      relativePathFromParent: Array<number | string>
+    ) =>
+      enhancing.enhance(
+        emptory.newAdministrativeInformation(),
+        parent,
+        relativePathFromParent
+      )
+  ),
+];
 
-export function forHasExtensions(
-  parent: aas.types.Class | null
-): Array<Definition<aas.types.IHasExtensions>> {
-  return [
-    new Definition(
-      "Relationship element",
-      aas.types.isRelationshipElement,
-      () => model.enhance(emptory.newRelationshipElement(), parent)
-    ),
-    new Definition(
-      "Annotated relationship element",
-      aas.types.isAnnotatedRelationshipElement,
-      () => model.enhance(emptory.newAnnotatedRelationshipElement(), parent)
-    ),
-    new Definition(
-      "Asset administration shell",
-      aas.types.isAssetAdministrationShell,
-      () => model.enhance(emptory.newAssetAdministrationShell(), parent)
-    ),
-    new Definition("Basic event element", aas.types.isBasicEventElement, () =>
-      model.enhance(emptory.newBasicEventElement(), parent)
-    ),
-    new Definition("Blob", aas.types.isBlob, () =>
-      model.enhance(emptory.newBlob(), parent)
-    ),
-    new Definition("Capability", aas.types.isCapability, () =>
-      model.enhance(emptory.newCapability(), parent)
-    ),
-    new Definition("Concept description", aas.types.isConceptDescription, () =>
-      model.enhance(emptory.newConceptDescription(), parent)
-    ),
-    new Definition("Entity", aas.types.isEntity, () =>
-      model.enhance(emptory.newEntity(), parent)
-    ),
-    new Definition("File", aas.types.isFile, () =>
-      model.enhance(emptory.newFile(), parent)
-    ),
-    new Definition(
-      "Multi language property",
-      aas.types.isMultiLanguageProperty,
-      () => model.enhance(emptory.newMultiLanguageProperty(), parent)
-    ),
-    new Definition("Operation", aas.types.isOperation, () =>
-      model.enhance(emptory.newOperation(), parent)
-    ),
-    new Definition("Property", aas.types.isProperty, () =>
-      model.enhance(emptory.newProperty(), parent)
-    ),
-    new Definition("Range", aas.types.isRange, () =>
-      model.enhance(emptory.newRange(), parent)
-    ),
-    new Definition("Reference element", aas.types.isReferenceElement, () =>
-      model.enhance(emptory.newReferenceElement(), parent)
-    ),
-    new Definition("Submodel", aas.types.isSubmodel, () =>
-      model.enhance(emptory.newSubmodel(), parent)
-    ),
-    new Definition(
-      "Submodel element collection",
-      aas.types.isSubmodelElementCollection,
-      () => model.enhance(emptory.newSubmodelElementCollection(), parent)
-    ),
-    new Definition(
-      "Submodel element list",
-      aas.types.isSubmodelElementList,
-      () => model.enhance(emptory.newSubmodelElementList(), parent)
-    ),
-  ];
-}
+export const FOR_QUALIFIER = [
+  new Definition(
+    "Qualifier",
+    aas.types.isQualifier,
+    (
+      parent: aas.types.Class | null,
+      relativePathFromParent: Array<number | string>
+    ) =>
+      enhancing.enhance(emptory.newQualifier(), parent, relativePathFromParent)
+  ),
+];
 
-export function forReferable(
-  parent: aas.types.Class | null
-): Array<Definition<aas.types.IReferable>> {
-  return [
-    new Definition(
-      "Relationship element",
-      aas.types.isRelationshipElement,
-      () => model.enhance(emptory.newRelationshipElement(), parent)
-    ),
-    new Definition(
-      "Annotated relationship element",
-      aas.types.isAnnotatedRelationshipElement,
-      () => model.enhance(emptory.newAnnotatedRelationshipElement(), parent)
-    ),
-    new Definition(
-      "Asset administration shell",
-      aas.types.isAssetAdministrationShell,
-      () => model.enhance(emptory.newAssetAdministrationShell(), parent)
-    ),
-    new Definition("Basic event element", aas.types.isBasicEventElement, () =>
-      model.enhance(emptory.newBasicEventElement(), parent)
-    ),
-    new Definition("Blob", aas.types.isBlob, () =>
-      model.enhance(emptory.newBlob(), parent)
-    ),
-    new Definition("Capability", aas.types.isCapability, () =>
-      model.enhance(emptory.newCapability(), parent)
-    ),
-    new Definition("Concept description", aas.types.isConceptDescription, () =>
-      model.enhance(emptory.newConceptDescription(), parent)
-    ),
-    new Definition("Entity", aas.types.isEntity, () =>
-      model.enhance(emptory.newEntity(), parent)
-    ),
-    new Definition("File", aas.types.isFile, () =>
-      model.enhance(emptory.newFile(), parent)
-    ),
-    new Definition(
-      "Multi language property",
-      aas.types.isMultiLanguageProperty,
-      () => model.enhance(emptory.newMultiLanguageProperty(), parent)
-    ),
-    new Definition("Operation", aas.types.isOperation, () =>
-      model.enhance(emptory.newOperation(), parent)
-    ),
-    new Definition("Property", aas.types.isProperty, () =>
-      model.enhance(emptory.newProperty(), parent)
-    ),
-    new Definition("Range", aas.types.isRange, () =>
-      model.enhance(emptory.newRange(), parent)
-    ),
-    new Definition("Reference element", aas.types.isReferenceElement, () =>
-      model.enhance(emptory.newReferenceElement(), parent)
-    ),
-    new Definition("Submodel", aas.types.isSubmodel, () =>
-      model.enhance(emptory.newSubmodel(), parent)
-    ),
-    new Definition(
-      "Submodel element collection",
-      aas.types.isSubmodelElementCollection,
-      () => model.enhance(emptory.newSubmodelElementCollection(), parent)
-    ),
-    new Definition(
-      "Submodel element list",
-      aas.types.isSubmodelElementList,
-      () => model.enhance(emptory.newSubmodelElementList(), parent)
-    ),
-  ];
-}
+export const FOR_ASSET_ADMINISTRATION_SHELL = [
+  new Definition(
+    "Asset administration shell",
+    aas.types.isAssetAdministrationShell,
+    (
+      parent: aas.types.Class | null,
+      relativePathFromParent: Array<number | string>
+    ) =>
+      enhancing.enhance(
+        emptory.newAssetAdministrationShell(),
+        parent,
+        relativePathFromParent
+      )
+  ),
+];
 
-export function forIdentifiable(
-  parent: aas.types.Class | null
-): Array<Definition<aas.types.IIdentifiable>> {
-  return [
-    new Definition(
-      "Asset administration shell",
-      aas.types.isAssetAdministrationShell,
-      () => model.enhance(emptory.newAssetAdministrationShell(), parent)
-    ),
-    new Definition("Concept description", aas.types.isConceptDescription, () =>
-      model.enhance(emptory.newConceptDescription(), parent)
-    ),
-    new Definition("Submodel", aas.types.isSubmodel, () =>
-      model.enhance(emptory.newSubmodel(), parent)
-    ),
-  ];
-}
+export const FOR_ASSET_INFORMATION = [
+  new Definition(
+    "Asset information",
+    aas.types.isAssetInformation,
+    (
+      parent: aas.types.Class | null,
+      relativePathFromParent: Array<number | string>
+    ) =>
+      enhancing.enhance(
+        emptory.newAssetInformation(),
+        parent,
+        relativePathFromParent
+      )
+  ),
+];
 
-export function forHasKind(
-  parent: aas.types.Class | null
-): Array<Definition<aas.types.IHasKind>> {
-  return [
-    new Definition(
-      "Relationship element",
-      aas.types.isRelationshipElement,
-      () => model.enhance(emptory.newRelationshipElement(), parent)
-    ),
-    new Definition(
-      "Annotated relationship element",
-      aas.types.isAnnotatedRelationshipElement,
-      () => model.enhance(emptory.newAnnotatedRelationshipElement(), parent)
-    ),
-    new Definition("Basic event element", aas.types.isBasicEventElement, () =>
-      model.enhance(emptory.newBasicEventElement(), parent)
-    ),
-    new Definition("Blob", aas.types.isBlob, () =>
-      model.enhance(emptory.newBlob(), parent)
-    ),
-    new Definition("Capability", aas.types.isCapability, () =>
-      model.enhance(emptory.newCapability(), parent)
-    ),
-    new Definition("Entity", aas.types.isEntity, () =>
-      model.enhance(emptory.newEntity(), parent)
-    ),
-    new Definition("File", aas.types.isFile, () =>
-      model.enhance(emptory.newFile(), parent)
-    ),
-    new Definition(
-      "Multi language property",
-      aas.types.isMultiLanguageProperty,
-      () => model.enhance(emptory.newMultiLanguageProperty(), parent)
-    ),
-    new Definition("Operation", aas.types.isOperation, () =>
-      model.enhance(emptory.newOperation(), parent)
-    ),
-    new Definition("Property", aas.types.isProperty, () =>
-      model.enhance(emptory.newProperty(), parent)
-    ),
-    new Definition("Range", aas.types.isRange, () =>
-      model.enhance(emptory.newRange(), parent)
-    ),
-    new Definition("Reference element", aas.types.isReferenceElement, () =>
-      model.enhance(emptory.newReferenceElement(), parent)
-    ),
-    new Definition("Submodel", aas.types.isSubmodel, () =>
-      model.enhance(emptory.newSubmodel(), parent)
-    ),
-    new Definition(
-      "Submodel element collection",
-      aas.types.isSubmodelElementCollection,
-      () => model.enhance(emptory.newSubmodelElementCollection(), parent)
-    ),
-    new Definition(
-      "Submodel element list",
-      aas.types.isSubmodelElementList,
-      () => model.enhance(emptory.newSubmodelElementList(), parent)
-    ),
-  ];
-}
+export const FOR_RESOURCE = [
+  new Definition(
+    "Resource",
+    aas.types.isResource,
+    (
+      parent: aas.types.Class | null,
+      relativePathFromParent: Array<number | string>
+    ) =>
+      enhancing.enhance(emptory.newResource(), parent, relativePathFromParent)
+  ),
+];
 
-export function forHasDataSpecification(
-  parent: aas.types.Class | null
-): Array<Definition<aas.types.IHasDataSpecification>> {
-  return [
-    new Definition(
-      "Administrative information",
-      aas.types.isAdministrativeInformation,
-      () => model.enhance(emptory.newAdministrativeInformation(), parent)
-    ),
-    new Definition(
-      "Relationship element",
-      aas.types.isRelationshipElement,
-      () => model.enhance(emptory.newRelationshipElement(), parent)
-    ),
-    new Definition(
-      "Annotated relationship element",
-      aas.types.isAnnotatedRelationshipElement,
-      () => model.enhance(emptory.newAnnotatedRelationshipElement(), parent)
-    ),
-    new Definition(
-      "Asset administration shell",
-      aas.types.isAssetAdministrationShell,
-      () => model.enhance(emptory.newAssetAdministrationShell(), parent)
-    ),
-    new Definition("Basic event element", aas.types.isBasicEventElement, () =>
-      model.enhance(emptory.newBasicEventElement(), parent)
-    ),
-    new Definition("Blob", aas.types.isBlob, () =>
-      model.enhance(emptory.newBlob(), parent)
-    ),
-    new Definition("Capability", aas.types.isCapability, () =>
-      model.enhance(emptory.newCapability(), parent)
-    ),
-    new Definition("Concept description", aas.types.isConceptDescription, () =>
-      model.enhance(emptory.newConceptDescription(), parent)
-    ),
-    new Definition("Entity", aas.types.isEntity, () =>
-      model.enhance(emptory.newEntity(), parent)
-    ),
-    new Definition("File", aas.types.isFile, () =>
-      model.enhance(emptory.newFile(), parent)
-    ),
-    new Definition(
-      "Multi language property",
-      aas.types.isMultiLanguageProperty,
-      () => model.enhance(emptory.newMultiLanguageProperty(), parent)
-    ),
-    new Definition("Operation", aas.types.isOperation, () =>
-      model.enhance(emptory.newOperation(), parent)
-    ),
-    new Definition("Property", aas.types.isProperty, () =>
-      model.enhance(emptory.newProperty(), parent)
-    ),
-    new Definition("Range", aas.types.isRange, () =>
-      model.enhance(emptory.newRange(), parent)
-    ),
-    new Definition("Reference element", aas.types.isReferenceElement, () =>
-      model.enhance(emptory.newReferenceElement(), parent)
-    ),
-    new Definition("Submodel", aas.types.isSubmodel, () =>
-      model.enhance(emptory.newSubmodel(), parent)
-    ),
-    new Definition(
-      "Submodel element collection",
-      aas.types.isSubmodelElementCollection,
-      () => model.enhance(emptory.newSubmodelElementCollection(), parent)
-    ),
-    new Definition(
-      "Submodel element list",
-      aas.types.isSubmodelElementList,
-      () => model.enhance(emptory.newSubmodelElementList(), parent)
-    ),
-  ];
-}
+export const FOR_SPECIFIC_ASSET_ID = [
+  new Definition(
+    "Specific asset id",
+    aas.types.isSpecificAssetId,
+    (
+      parent: aas.types.Class | null,
+      relativePathFromParent: Array<number | string>
+    ) =>
+      enhancing.enhance(
+        emptory.newSpecificAssetId(),
+        parent,
+        relativePathFromParent
+      )
+  ),
+];
 
-export function forAdministrativeInformation(
-  parent: aas.types.Class | null
-): Array<Definition<aas.types.AdministrativeInformation>> {
-  return [
-    new Definition(
-      "Administrative information",
-      aas.types.isAdministrativeInformation,
-      () => model.enhance(emptory.newAdministrativeInformation(), parent)
-    ),
-  ];
-}
+export const FOR_SUBMODEL = [
+  new Definition(
+    "Submodel",
+    aas.types.isSubmodel,
+    (
+      parent: aas.types.Class | null,
+      relativePathFromParent: Array<number | string>
+    ) =>
+      enhancing.enhance(emptory.newSubmodel(), parent, relativePathFromParent)
+  ),
+];
 
-export function forQualifiable(
-  parent: aas.types.Class | null
-): Array<Definition<aas.types.IQualifiable>> {
-  return [
-    new Definition(
-      "Relationship element",
-      aas.types.isRelationshipElement,
-      () => model.enhance(emptory.newRelationshipElement(), parent)
-    ),
-    new Definition(
-      "Annotated relationship element",
-      aas.types.isAnnotatedRelationshipElement,
-      () => model.enhance(emptory.newAnnotatedRelationshipElement(), parent)
-    ),
-    new Definition("Basic event element", aas.types.isBasicEventElement, () =>
-      model.enhance(emptory.newBasicEventElement(), parent)
-    ),
-    new Definition("Blob", aas.types.isBlob, () =>
-      model.enhance(emptory.newBlob(), parent)
-    ),
-    new Definition("Capability", aas.types.isCapability, () =>
-      model.enhance(emptory.newCapability(), parent)
-    ),
-    new Definition("Entity", aas.types.isEntity, () =>
-      model.enhance(emptory.newEntity(), parent)
-    ),
-    new Definition("File", aas.types.isFile, () =>
-      model.enhance(emptory.newFile(), parent)
-    ),
-    new Definition(
-      "Multi language property",
-      aas.types.isMultiLanguageProperty,
-      () => model.enhance(emptory.newMultiLanguageProperty(), parent)
-    ),
-    new Definition("Operation", aas.types.isOperation, () =>
-      model.enhance(emptory.newOperation(), parent)
-    ),
-    new Definition("Property", aas.types.isProperty, () =>
-      model.enhance(emptory.newProperty(), parent)
-    ),
-    new Definition("Range", aas.types.isRange, () =>
-      model.enhance(emptory.newRange(), parent)
-    ),
-    new Definition("Reference element", aas.types.isReferenceElement, () =>
-      model.enhance(emptory.newReferenceElement(), parent)
-    ),
-    new Definition("Submodel", aas.types.isSubmodel, () =>
-      model.enhance(emptory.newSubmodel(), parent)
-    ),
-    new Definition(
-      "Submodel element collection",
-      aas.types.isSubmodelElementCollection,
-      () => model.enhance(emptory.newSubmodelElementCollection(), parent)
-    ),
-    new Definition(
-      "Submodel element list",
-      aas.types.isSubmodelElementList,
-      () => model.enhance(emptory.newSubmodelElementList(), parent)
-    ),
-  ];
-}
+export const FOR_SUBMODEL_ELEMENT = [
+  new Definition(
+    "Relationship element",
+    aas.types.isRelationshipElement,
+    (
+      parent: aas.types.Class | null,
+      relativePathFromParent: Array<number | string>
+    ) =>
+      enhancing.enhance(
+        emptory.newRelationshipElement(),
+        parent,
+        relativePathFromParent
+      )
+  ),
+  new Definition(
+    "Annotated relationship element",
+    aas.types.isAnnotatedRelationshipElement,
+    (
+      parent: aas.types.Class | null,
+      relativePathFromParent: Array<number | string>
+    ) =>
+      enhancing.enhance(
+        emptory.newAnnotatedRelationshipElement(),
+        parent,
+        relativePathFromParent
+      )
+  ),
+  new Definition(
+    "Basic event element",
+    aas.types.isBasicEventElement,
+    (
+      parent: aas.types.Class | null,
+      relativePathFromParent: Array<number | string>
+    ) =>
+      enhancing.enhance(
+        emptory.newBasicEventElement(),
+        parent,
+        relativePathFromParent
+      )
+  ),
+  new Definition(
+    "Blob",
+    aas.types.isBlob,
+    (
+      parent: aas.types.Class | null,
+      relativePathFromParent: Array<number | string>
+    ) => enhancing.enhance(emptory.newBlob(), parent, relativePathFromParent)
+  ),
+  new Definition(
+    "Capability",
+    aas.types.isCapability,
+    (
+      parent: aas.types.Class | null,
+      relativePathFromParent: Array<number | string>
+    ) =>
+      enhancing.enhance(emptory.newCapability(), parent, relativePathFromParent)
+  ),
+  new Definition(
+    "Entity",
+    aas.types.isEntity,
+    (
+      parent: aas.types.Class | null,
+      relativePathFromParent: Array<number | string>
+    ) => enhancing.enhance(emptory.newEntity(), parent, relativePathFromParent)
+  ),
+  new Definition(
+    "File",
+    aas.types.isFile,
+    (
+      parent: aas.types.Class | null,
+      relativePathFromParent: Array<number | string>
+    ) => enhancing.enhance(emptory.newFile(), parent, relativePathFromParent)
+  ),
+  new Definition(
+    "Multi language property",
+    aas.types.isMultiLanguageProperty,
+    (
+      parent: aas.types.Class | null,
+      relativePathFromParent: Array<number | string>
+    ) =>
+      enhancing.enhance(
+        emptory.newMultiLanguageProperty(),
+        parent,
+        relativePathFromParent
+      )
+  ),
+  new Definition(
+    "Operation",
+    aas.types.isOperation,
+    (
+      parent: aas.types.Class | null,
+      relativePathFromParent: Array<number | string>
+    ) =>
+      enhancing.enhance(emptory.newOperation(), parent, relativePathFromParent)
+  ),
+  new Definition(
+    "Property",
+    aas.types.isProperty,
+    (
+      parent: aas.types.Class | null,
+      relativePathFromParent: Array<number | string>
+    ) =>
+      enhancing.enhance(emptory.newProperty(), parent, relativePathFromParent)
+  ),
+  new Definition(
+    "Range",
+    aas.types.isRange,
+    (
+      parent: aas.types.Class | null,
+      relativePathFromParent: Array<number | string>
+    ) => enhancing.enhance(emptory.newRange(), parent, relativePathFromParent)
+  ),
+  new Definition(
+    "Reference element",
+    aas.types.isReferenceElement,
+    (
+      parent: aas.types.Class | null,
+      relativePathFromParent: Array<number | string>
+    ) =>
+      enhancing.enhance(
+        emptory.newReferenceElement(),
+        parent,
+        relativePathFromParent
+      )
+  ),
+  new Definition(
+    "Submodel element collection",
+    aas.types.isSubmodelElementCollection,
+    (
+      parent: aas.types.Class | null,
+      relativePathFromParent: Array<number | string>
+    ) =>
+      enhancing.enhance(
+        emptory.newSubmodelElementCollection(),
+        parent,
+        relativePathFromParent
+      )
+  ),
+  new Definition(
+    "Submodel element list",
+    aas.types.isSubmodelElementList,
+    (
+      parent: aas.types.Class | null,
+      relativePathFromParent: Array<number | string>
+    ) =>
+      enhancing.enhance(
+        emptory.newSubmodelElementList(),
+        parent,
+        relativePathFromParent
+      )
+  ),
+];
 
-export function forQualifier(
-  parent: aas.types.Class | null
-): Array<Definition<aas.types.Qualifier>> {
-  return [
-    new Definition("Qualifier", aas.types.isQualifier, () =>
-      model.enhance(emptory.newQualifier(), parent)
-    ),
-  ];
-}
+export const FOR_DATA_ELEMENT = [
+  new Definition(
+    "Blob",
+    aas.types.isBlob,
+    (
+      parent: aas.types.Class | null,
+      relativePathFromParent: Array<number | string>
+    ) => enhancing.enhance(emptory.newBlob(), parent, relativePathFromParent)
+  ),
+  new Definition(
+    "File",
+    aas.types.isFile,
+    (
+      parent: aas.types.Class | null,
+      relativePathFromParent: Array<number | string>
+    ) => enhancing.enhance(emptory.newFile(), parent, relativePathFromParent)
+  ),
+  new Definition(
+    "Multi language property",
+    aas.types.isMultiLanguageProperty,
+    (
+      parent: aas.types.Class | null,
+      relativePathFromParent: Array<number | string>
+    ) =>
+      enhancing.enhance(
+        emptory.newMultiLanguageProperty(),
+        parent,
+        relativePathFromParent
+      )
+  ),
+  new Definition(
+    "Property",
+    aas.types.isProperty,
+    (
+      parent: aas.types.Class | null,
+      relativePathFromParent: Array<number | string>
+    ) =>
+      enhancing.enhance(emptory.newProperty(), parent, relativePathFromParent)
+  ),
+  new Definition(
+    "Range",
+    aas.types.isRange,
+    (
+      parent: aas.types.Class | null,
+      relativePathFromParent: Array<number | string>
+    ) => enhancing.enhance(emptory.newRange(), parent, relativePathFromParent)
+  ),
+  new Definition(
+    "Reference element",
+    aas.types.isReferenceElement,
+    (
+      parent: aas.types.Class | null,
+      relativePathFromParent: Array<number | string>
+    ) =>
+      enhancing.enhance(
+        emptory.newReferenceElement(),
+        parent,
+        relativePathFromParent
+      )
+  ),
+];
 
-export function forAssetAdministrationShell(
-  parent: aas.types.Class | null
-): Array<Definition<aas.types.AssetAdministrationShell>> {
-  return [
-    new Definition(
-      "Asset administration shell",
-      aas.types.isAssetAdministrationShell,
-      () => model.enhance(emptory.newAssetAdministrationShell(), parent)
-    ),
-  ];
-}
+export const FOR_OPERATION_VARIABLE = [
+  new Definition(
+    "Operation variable",
+    aas.types.isOperationVariable,
+    (
+      parent: aas.types.Class | null,
+      relativePathFromParent: Array<number | string>
+    ) =>
+      enhancing.enhance(
+        emptory.newOperationVariable(),
+        parent,
+        relativePathFromParent
+      )
+  ),
+];
 
-export function forAssetInformation(
-  parent: aas.types.Class | null
-): Array<Definition<aas.types.AssetInformation>> {
-  return [
-    new Definition("Asset information", aas.types.isAssetInformation, () =>
-      model.enhance(emptory.newAssetInformation(), parent)
-    ),
-  ];
-}
+export const FOR_CONCEPT_DESCRIPTION = [
+  new Definition(
+    "Concept description",
+    aas.types.isConceptDescription,
+    (
+      parent: aas.types.Class | null,
+      relativePathFromParent: Array<number | string>
+    ) =>
+      enhancing.enhance(
+        emptory.newConceptDescription(),
+        parent,
+        relativePathFromParent
+      )
+  ),
+];
 
-export function forResource(
-  parent: aas.types.Class | null
-): Array<Definition<aas.types.Resource>> {
-  return [
-    new Definition("Resource", aas.types.isResource, () =>
-      model.enhance(emptory.newResource(), parent)
-    ),
-  ];
-}
+export const FOR_REFERENCE = [
+  new Definition(
+    "Reference",
+    aas.types.isReference,
+    (
+      parent: aas.types.Class | null,
+      relativePathFromParent: Array<number | string>
+    ) =>
+      enhancing.enhance(emptory.newReference(), parent, relativePathFromParent)
+  ),
+];
 
-export function forSpecificAssetId(
-  parent: aas.types.Class | null
-): Array<Definition<aas.types.SpecificAssetId>> {
-  return [
-    new Definition("Specific asset id", aas.types.isSpecificAssetId, () =>
-      model.enhance(emptory.newSpecificAssetId(), parent)
-    ),
-  ];
-}
+export const FOR_KEY = [
+  new Definition(
+    "Key",
+    aas.types.isKey,
+    (
+      parent: aas.types.Class | null,
+      relativePathFromParent: Array<number | string>
+    ) => enhancing.enhance(emptory.newKey(), parent, relativePathFromParent)
+  ),
+];
 
-export function forSubmodel(
-  parent: aas.types.Class | null
-): Array<Definition<aas.types.Submodel>> {
-  return [
-    new Definition("Submodel", aas.types.isSubmodel, () =>
-      model.enhance(emptory.newSubmodel(), parent)
-    ),
-  ];
-}
+export const FOR_LANG_STRING = [
+  new Definition(
+    "Lang string",
+    aas.types.isLangString,
+    (
+      parent: aas.types.Class | null,
+      relativePathFromParent: Array<number | string>
+    ) =>
+      enhancing.enhance(emptory.newLangString(), parent, relativePathFromParent)
+  ),
+];
 
-export function forSubmodelElement(
-  parent: aas.types.Class | null
-): Array<Definition<aas.types.ISubmodelElement>> {
-  return [
-    new Definition(
-      "Relationship element",
-      aas.types.isRelationshipElement,
-      () => model.enhance(emptory.newRelationshipElement(), parent)
-    ),
-    new Definition(
-      "Annotated relationship element",
-      aas.types.isAnnotatedRelationshipElement,
-      () => model.enhance(emptory.newAnnotatedRelationshipElement(), parent)
-    ),
-    new Definition("Basic event element", aas.types.isBasicEventElement, () =>
-      model.enhance(emptory.newBasicEventElement(), parent)
-    ),
-    new Definition("Blob", aas.types.isBlob, () =>
-      model.enhance(emptory.newBlob(), parent)
-    ),
-    new Definition("Capability", aas.types.isCapability, () =>
-      model.enhance(emptory.newCapability(), parent)
-    ),
-    new Definition("Entity", aas.types.isEntity, () =>
-      model.enhance(emptory.newEntity(), parent)
-    ),
-    new Definition("File", aas.types.isFile, () =>
-      model.enhance(emptory.newFile(), parent)
-    ),
-    new Definition(
-      "Multi language property",
-      aas.types.isMultiLanguageProperty,
-      () => model.enhance(emptory.newMultiLanguageProperty(), parent)
-    ),
-    new Definition("Operation", aas.types.isOperation, () =>
-      model.enhance(emptory.newOperation(), parent)
-    ),
-    new Definition("Property", aas.types.isProperty, () =>
-      model.enhance(emptory.newProperty(), parent)
-    ),
-    new Definition("Range", aas.types.isRange, () =>
-      model.enhance(emptory.newRange(), parent)
-    ),
-    new Definition("Reference element", aas.types.isReferenceElement, () =>
-      model.enhance(emptory.newReferenceElement(), parent)
-    ),
-    new Definition(
-      "Submodel element collection",
-      aas.types.isSubmodelElementCollection,
-      () => model.enhance(emptory.newSubmodelElementCollection(), parent)
-    ),
-    new Definition(
-      "Submodel element list",
-      aas.types.isSubmodelElementList,
-      () => model.enhance(emptory.newSubmodelElementList(), parent)
-    ),
-  ];
-}
+export const FOR_DATA_SPECIFICATION_CONTENT = [
+  new Definition(
+    "Data specification IEC 61360",
+    aas.types.isDataSpecificationIec61360,
+    (
+      parent: aas.types.Class | null,
+      relativePathFromParent: Array<number | string>
+    ) =>
+      enhancing.enhance(
+        emptory.newDataSpecificationIec61360(),
+        parent,
+        relativePathFromParent
+      )
+  ),
+  new Definition(
+    "Data specification physical unit",
+    aas.types.isDataSpecificationPhysicalUnit,
+    (
+      parent: aas.types.Class | null,
+      relativePathFromParent: Array<number | string>
+    ) =>
+      enhancing.enhance(
+        emptory.newDataSpecificationPhysicalUnit(),
+        parent,
+        relativePathFromParent
+      )
+  ),
+];
 
-export function forRelationshipElement(
-  parent: aas.types.Class | null
-): Array<Definition<aas.types.IRelationshipElement>> {
-  return [
-    new Definition(
-      "Relationship element",
-      aas.types.isRelationshipElement,
-      () => model.enhance(emptory.newRelationshipElement(), parent)
-    ),
-    new Definition(
-      "Annotated relationship element",
-      aas.types.isAnnotatedRelationshipElement,
-      () => model.enhance(emptory.newAnnotatedRelationshipElement(), parent)
-    ),
-  ];
-}
+export const FOR_EMBEDDED_DATA_SPECIFICATION = [
+  new Definition(
+    "Embedded data specification",
+    aas.types.isEmbeddedDataSpecification,
+    (
+      parent: aas.types.Class | null,
+      relativePathFromParent: Array<number | string>
+    ) =>
+      enhancing.enhance(
+        emptory.newEmbeddedDataSpecification(),
+        parent,
+        relativePathFromParent
+      )
+  ),
+];
 
-export function forSubmodelElementList(
-  parent: aas.types.Class | null
-): Array<Definition<aas.types.SubmodelElementList>> {
-  return [
-    new Definition(
-      "Submodel element list",
-      aas.types.isSubmodelElementList,
-      () => model.enhance(emptory.newSubmodelElementList(), parent)
-    ),
-  ];
-}
+export const FOR_VALUE_REFERENCE_PAIR = [
+  new Definition(
+    "Value reference pair",
+    aas.types.isValueReferencePair,
+    (
+      parent: aas.types.Class | null,
+      relativePathFromParent: Array<number | string>
+    ) =>
+      enhancing.enhance(
+        emptory.newValueReferencePair(),
+        parent,
+        relativePathFromParent
+      )
+  ),
+];
 
-export function forSubmodelElementCollection(
-  parent: aas.types.Class | null
-): Array<Definition<aas.types.SubmodelElementCollection>> {
-  return [
-    new Definition(
-      "Submodel element collection",
-      aas.types.isSubmodelElementCollection,
-      () => model.enhance(emptory.newSubmodelElementCollection(), parent)
-    ),
-  ];
-}
-
-export function forDataElement(
-  parent: aas.types.Class | null
-): Array<Definition<aas.types.IDataElement>> {
-  return [
-    new Definition("Blob", aas.types.isBlob, () =>
-      model.enhance(emptory.newBlob(), parent)
-    ),
-    new Definition("File", aas.types.isFile, () =>
-      model.enhance(emptory.newFile(), parent)
-    ),
-    new Definition(
-      "Multi language property",
-      aas.types.isMultiLanguageProperty,
-      () => model.enhance(emptory.newMultiLanguageProperty(), parent)
-    ),
-    new Definition("Property", aas.types.isProperty, () =>
-      model.enhance(emptory.newProperty(), parent)
-    ),
-    new Definition("Range", aas.types.isRange, () =>
-      model.enhance(emptory.newRange(), parent)
-    ),
-    new Definition("Reference element", aas.types.isReferenceElement, () =>
-      model.enhance(emptory.newReferenceElement(), parent)
-    ),
-  ];
-}
-
-export function forProperty(
-  parent: aas.types.Class | null
-): Array<Definition<aas.types.Property>> {
-  return [
-    new Definition("Property", aas.types.isProperty, () =>
-      model.enhance(emptory.newProperty(), parent)
-    ),
-  ];
-}
-
-export function forMultiLanguageProperty(
-  parent: aas.types.Class | null
-): Array<Definition<aas.types.MultiLanguageProperty>> {
-  return [
-    new Definition(
-      "Multi language property",
-      aas.types.isMultiLanguageProperty,
-      () => model.enhance(emptory.newMultiLanguageProperty(), parent)
-    ),
-  ];
-}
-
-export function forRange(
-  parent: aas.types.Class | null
-): Array<Definition<aas.types.Range>> {
-  return [
-    new Definition("Range", aas.types.isRange, () =>
-      model.enhance(emptory.newRange(), parent)
-    ),
-  ];
-}
-
-export function forReferenceElement(
-  parent: aas.types.Class | null
-): Array<Definition<aas.types.ReferenceElement>> {
-  return [
-    new Definition("Reference element", aas.types.isReferenceElement, () =>
-      model.enhance(emptory.newReferenceElement(), parent)
-    ),
-  ];
-}
-
-export function forBlob(
-  parent: aas.types.Class | null
-): Array<Definition<aas.types.Blob>> {
-  return [
-    new Definition("Blob", aas.types.isBlob, () =>
-      model.enhance(emptory.newBlob(), parent)
-    ),
-  ];
-}
-
-export function forFile(
-  parent: aas.types.Class | null
-): Array<Definition<aas.types.File>> {
-  return [
-    new Definition("File", aas.types.isFile, () =>
-      model.enhance(emptory.newFile(), parent)
-    ),
-  ];
-}
-
-export function forAnnotatedRelationshipElement(
-  parent: aas.types.Class | null
-): Array<Definition<aas.types.AnnotatedRelationshipElement>> {
-  return [
-    new Definition(
-      "Annotated relationship element",
-      aas.types.isAnnotatedRelationshipElement,
-      () => model.enhance(emptory.newAnnotatedRelationshipElement(), parent)
-    ),
-  ];
-}
-
-export function forEntity(
-  parent: aas.types.Class | null
-): Array<Definition<aas.types.Entity>> {
-  return [
-    new Definition("Entity", aas.types.isEntity, () =>
-      model.enhance(emptory.newEntity(), parent)
-    ),
-  ];
-}
-
-export function forEventPayload(
-  parent: aas.types.Class | null
-): Array<Definition<aas.types.EventPayload>> {
-  return [
-    new Definition("Event payload", aas.types.isEventPayload, () =>
-      model.enhance(emptory.newEventPayload(), parent)
-    ),
-  ];
-}
-
-export function forEventElement(
-  parent: aas.types.Class | null
-): Array<Definition<aas.types.IEventElement>> {
-  return [
-    new Definition("Basic event element", aas.types.isBasicEventElement, () =>
-      model.enhance(emptory.newBasicEventElement(), parent)
-    ),
-  ];
-}
-
-export function forBasicEventElement(
-  parent: aas.types.Class | null
-): Array<Definition<aas.types.BasicEventElement>> {
-  return [
-    new Definition("Basic event element", aas.types.isBasicEventElement, () =>
-      model.enhance(emptory.newBasicEventElement(), parent)
-    ),
-  ];
-}
-
-export function forOperation(
-  parent: aas.types.Class | null
-): Array<Definition<aas.types.Operation>> {
-  return [
-    new Definition("Operation", aas.types.isOperation, () =>
-      model.enhance(emptory.newOperation(), parent)
-    ),
-  ];
-}
-
-export function forOperationVariable(
-  parent: aas.types.Class | null
-): Array<Definition<aas.types.OperationVariable>> {
-  return [
-    new Definition("Operation variable", aas.types.isOperationVariable, () =>
-      model.enhance(emptory.newOperationVariable(), parent)
-    ),
-  ];
-}
-
-export function forCapability(
-  parent: aas.types.Class | null
-): Array<Definition<aas.types.Capability>> {
-  return [
-    new Definition("Capability", aas.types.isCapability, () =>
-      model.enhance(emptory.newCapability(), parent)
-    ),
-  ];
-}
-
-export function forConceptDescription(
-  parent: aas.types.Class | null
-): Array<Definition<aas.types.ConceptDescription>> {
-  return [
-    new Definition("Concept description", aas.types.isConceptDescription, () =>
-      model.enhance(emptory.newConceptDescription(), parent)
-    ),
-  ];
-}
-
-export function forReference(
-  parent: aas.types.Class | null
-): Array<Definition<aas.types.Reference>> {
-  return [
-    new Definition("Reference", aas.types.isReference, () =>
-      model.enhance(emptory.newReference(), parent)
-    ),
-  ];
-}
-
-export function forKey(
-  parent: aas.types.Class | null
-): Array<Definition<aas.types.Key>> {
-  return [
-    new Definition("Key", aas.types.isKey, () =>
-      model.enhance(emptory.newKey(), parent)
-    ),
-  ];
-}
-
-export function forLangString(
-  parent: aas.types.Class | null
-): Array<Definition<aas.types.LangString>> {
-  return [
-    new Definition("Lang string", aas.types.isLangString, () =>
-      model.enhance(emptory.newLangString(), parent)
-    ),
-  ];
-}
-
-export function forEnvironment(
-  parent: aas.types.Class | null
-): Array<Definition<aas.types.Environment>> {
-  return [
-    new Definition("Environment", aas.types.isEnvironment, () =>
-      model.enhance(emptory.newEnvironment(), parent)
-    ),
-  ];
-}
-
-export function forDataSpecificationContent(
-  parent: aas.types.Class | null
-): Array<Definition<aas.types.IDataSpecificationContent>> {
-  return [
-    new Definition(
-      "Data specification IEC 61360",
-      aas.types.isDataSpecificationIec61360,
-      () => model.enhance(emptory.newDataSpecificationIec61360(), parent)
-    ),
-    new Definition(
-      "Data specification physical unit",
-      aas.types.isDataSpecificationPhysicalUnit,
-      () => model.enhance(emptory.newDataSpecificationPhysicalUnit(), parent)
-    ),
-  ];
-}
-
-export function forEmbeddedDataSpecification(
-  parent: aas.types.Class | null
-): Array<Definition<aas.types.EmbeddedDataSpecification>> {
-  return [
-    new Definition(
-      "Embedded data specification",
-      aas.types.isEmbeddedDataSpecification,
-      () => model.enhance(emptory.newEmbeddedDataSpecification(), parent)
-    ),
-  ];
-}
-
-export function forValueReferencePair(
-  parent: aas.types.Class | null
-): Array<Definition<aas.types.ValueReferencePair>> {
-  return [
-    new Definition("Value reference pair", aas.types.isValueReferencePair, () =>
-      model.enhance(emptory.newValueReferencePair(), parent)
-    ),
-  ];
-}
-
-export function forValueList(
-  parent: aas.types.Class | null
-): Array<Definition<aas.types.ValueList>> {
-  return [
-    new Definition("Value list", aas.types.isValueList, () =>
-      model.enhance(emptory.newValueList(), parent)
-    ),
-  ];
-}
-
-export function forDataSpecificationIec61360(
-  parent: aas.types.Class | null
-): Array<Definition<aas.types.DataSpecificationIec61360>> {
-  return [
-    new Definition(
-      "Data specification IEC 61360",
-      aas.types.isDataSpecificationIec61360,
-      () => model.enhance(emptory.newDataSpecificationIec61360(), parent)
-    ),
-  ];
-}
-
-export function forDataSpecificationPhysicalUnit(
-  parent: aas.types.Class | null
-): Array<Definition<aas.types.DataSpecificationPhysicalUnit>> {
-  return [
-    new Definition(
-      "Data specification physical unit",
-      aas.types.isDataSpecificationPhysicalUnit,
-      () => model.enhance(emptory.newDataSpecificationPhysicalUnit(), parent)
-    ),
-  ];
-}
+export const FOR_VALUE_LIST = [
+  new Definition(
+    "Value list",
+    aas.types.isValueList,
+    (
+      parent: aas.types.Class | null,
+      relativePathFromParent: Array<number | string>
+    ) =>
+      enhancing.enhance(emptory.newValueList(), parent, relativePathFromParent)
+  ),
+];
 
 //
 // WARNING: this code has been automatically generated by codegen.

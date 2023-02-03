@@ -13,8 +13,8 @@ import * as aas from "@aas-core-works/aas-core3.0rc02-typescript";
 import * as React from "react";
 
 import * as fields from '../fields';
-import * as newinstancing from '../../newinstancing.generated';
 import * as help from './help.generated';
+import * as newinstancing from '../../newinstancing.generated';
 
 export function ExtensionFields(
   props: {
@@ -29,6 +29,8 @@ export function ExtensionFields(
         helpUrl={
           `${help.ROOT_URL}/Extension.html#property-semantic_id`
         }
+        parent={props.instance}
+        property="semanticId"
         snapInstance={
           props.snapInstance.semanticId
         }
@@ -36,9 +38,7 @@ export function ExtensionFields(
           props.instance.semanticId
         }
         newInstanceDefinitions={
-          newinstancing.forReference(
-            props.instance
-          )
+          newinstancing.FOR_REFERENCE
         }
         setInstance={
           (instance) => {
@@ -52,10 +52,10 @@ export function ExtensionFields(
         helpUrl={
           `${help.ROOT_URL}/Extension.html#property-supplemental_semantic_ids`
         }
+        parent={props.instance}
+        property="supplementalSemanticIds"
         newInstanceDefinitions={
-          newinstancing.forReference(
-            props.instance
-          )
+          newinstancing.FOR_REFERENCE
         }
         snapItems={
           props.snapInstance.supplementalSemanticIds
@@ -116,6 +116,8 @@ export function ExtensionFields(
         helpUrl={
           `${help.ROOT_URL}/Extension.html#property-refers_to`
         }
+        parent={props.instance}
+        property="refersTo"
         snapInstance={
           props.snapInstance.refersTo
         }
@@ -123,9 +125,7 @@ export function ExtensionFields(
           props.instance.refersTo
         }
         newInstanceDefinitions={
-          newinstancing.forReference(
-            props.instance
-          )
+          newinstancing.FOR_REFERENCE
         }
         setInstance={
           (instance) => {
