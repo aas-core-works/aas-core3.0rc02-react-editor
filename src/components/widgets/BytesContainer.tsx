@@ -2,29 +2,7 @@ import * as aas from "@aas-core-works/aas-core3.0rc02-typescript";
 import * as React from "react";
 
 import * as  mimetype from "../../mimetype";
-
-// From: https://usehooks.com/useDebounce/
-function useDebounce<T>(value: T, delay: number) {
-  const [debouncedValue, setDebouncedValue] = React.useState(value);
-
-  React.useEffect(
-    () => {
-      // Update debounced value after delay
-      const handler = setTimeout(() => {
-        setDebouncedValue(value);
-      }, delay);
-
-      return () => {
-        clearTimeout(handler);
-      };
-    },
-    // Only re-call effect if value or delay changes
-    [value, delay]
-  );
-
-  return debouncedValue;
-}
-
+import * as hooks from "../hooks"
 
 export function BytesContainer(
   props: {
@@ -95,7 +73,7 @@ export function BytesContainer(
     renderContent()
   );
 
-  const debouncedContentType = useDebounce(props.contentType, 200);
+  const debouncedContentType = hooks.useDebounce(props.contentType, 200);
 
   React.useEffect(
     () => {
