@@ -2,7 +2,7 @@ import * as aas from "@aas-core-works/aas-core3.0rc02-typescript";
 import * as React from "react";
 import * as valtio from "valtio";
 
-import * as model from '../model'
+import * as hooks from "./hooks"
 import * as verification from '../verification'
 
 function sortErrors(
@@ -59,6 +59,16 @@ export function Errors(
     props.verification.errorMap.versioning
   );
 
+  const debouncedPathVersion = hooks.useDebounce(
+    snapInstancesPathVersioning.version,
+    200
+  );
+
+  const debouncedErrorVersion = hooks.useDebounce(
+    snapErrorVersioning.version,
+    200
+  );
+
   React.useEffect(
     () => {
       const errors = sortErrors(props.verification.errorMap.errors());
@@ -69,8 +79,8 @@ export function Errors(
       }
     },
     [
-      snapInstancesPathVersioning.version,
-      snapErrorVersioning.version
+      debouncedPathVersion,
+      debouncedErrorVersion
     ]
   )
 
