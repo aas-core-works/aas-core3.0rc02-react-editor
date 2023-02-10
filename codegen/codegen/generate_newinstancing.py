@@ -71,12 +71,6 @@ new Definition(
 
     for_name = typescript_naming.constant_name(Identifier(f"for_{cls.name}"))
 
-    definition_type = (
-        f"Definition<aas.types.{typescript_naming.interface_name(cls.name)}>"
-        if cls.interface is not None
-        else f"Definition<aas.types.{typescript_naming.class_name(cls.name)}>"
-    )
-
     definitions_joined = ",\n".join(definitions)
 
     return Stripped(

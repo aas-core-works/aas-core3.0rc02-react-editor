@@ -106,9 +106,9 @@ if (that.{prop_name} !== null) {{
         blocks.append(block)
 
     disable_unused_directive = (
-       ""
-       if len(blocks) > 0
-       else f"{I}// eslint-disable-next-line @typescript-eslint/no-unused-vars\n"
+        ""
+        if len(blocks) > 0
+        else f"{I}// eslint-disable-next-line @typescript-eslint/no-unused-vars\n"
     )
     if len(blocks) == 0:
         blocks.append(Stripped("// No further recursion possible."))
