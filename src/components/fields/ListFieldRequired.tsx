@@ -53,6 +53,30 @@ export function ListFieldRequired<ClassT extends aas.types.Class>(
                       }
                     }
                   }
+
+                  shiftLeft={
+                    (i === 0) ? null : () => {
+                      props.setItems(
+                        model.moveInContainer(
+                          props.items!,
+                          ourId,
+                          i - 1
+                        )
+                      );
+                    }
+                  }
+
+                  shiftRight={
+                    (i == props.items!.length - 1) ? null : () => {
+                      props.setItems(
+                        model.moveInContainer(
+                          props.items!,
+                          ourId,
+                          i + 1
+                        )
+                      );
+                    }
+                  }
                 />
               )
             }
