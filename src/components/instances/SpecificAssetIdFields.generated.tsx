@@ -13,8 +13,8 @@ import * as aas from "@aas-core-works/aas-core3.0rc02-typescript";
 import * as React from "react";
 
 import * as fields from '../fields';
-import * as newinstancing from '../../newinstancing.generated';
 import * as help from './help.generated';
+import * as newinstancing from '../../newinstancing.generated';
 
 export function SpecificAssetIdFields(
   props: {
@@ -29,6 +29,8 @@ export function SpecificAssetIdFields(
         helpUrl={
           `${help.ROOT_URL}/Specific_asset_id.html#property-semantic_id`
         }
+        parent={props.instance}
+        property="semanticId"
         snapInstance={
           props.snapInstance.semanticId
         }
@@ -36,9 +38,7 @@ export function SpecificAssetIdFields(
           props.instance.semanticId
         }
         newInstanceDefinitions={
-          newinstancing.forReference(
-            props.instance
-          )
+          newinstancing.FOR_REFERENCE
         }
         setInstance={
           (instance) => {
@@ -52,10 +52,10 @@ export function SpecificAssetIdFields(
         helpUrl={
           `${help.ROOT_URL}/Specific_asset_id.html#property-supplemental_semantic_ids`
         }
+        parent={props.instance}
+        property="supplementalSemanticIds"
         newInstanceDefinitions={
-          newinstancing.forReference(
-            props.instance
-          )
+          newinstancing.FOR_REFERENCE
         }
         snapItems={
           props.snapInstance.supplementalSemanticIds
@@ -101,6 +101,8 @@ export function SpecificAssetIdFields(
         helpUrl={
           `${help.ROOT_URL}/Specific_asset_id.html#property-external_subject_id`
         }
+        parent={props.instance}
+        property="externalSubjectId"
         snapInstance={
           props.snapInstance.externalSubjectId
         }
@@ -108,9 +110,7 @@ export function SpecificAssetIdFields(
           props.instance.externalSubjectId
         }
         newInstanceDefinitions={
-          newinstancing.forReference(
-            props.instance
-          )
+          newinstancing.FOR_REFERENCE
         }
         setInstance={
           (instance) => {

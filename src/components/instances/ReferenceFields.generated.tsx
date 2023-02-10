@@ -13,8 +13,8 @@ import * as aas from "@aas-core-works/aas-core3.0rc02-typescript";
 import * as React from "react";
 
 import * as fields from '../fields';
-import * as newinstancing from '../../newinstancing.generated';
 import * as help from './help.generated';
+import * as newinstancing from '../../newinstancing.generated';
 
 export function ReferenceFields(
   props: {
@@ -44,6 +44,8 @@ export function ReferenceFields(
         helpUrl={
           `${help.ROOT_URL}/Reference.html#property-referred_semantic_id`
         }
+        parent={props.instance}
+        property="referredSemanticId"
         snapInstance={
           props.snapInstance.referredSemanticId
         }
@@ -51,9 +53,7 @@ export function ReferenceFields(
           props.instance.referredSemanticId
         }
         newInstanceDefinitions={
-          newinstancing.forReference(
-            props.instance
-          )
+          newinstancing.FOR_REFERENCE
         }
         setInstance={
           (instance) => {
@@ -67,10 +67,10 @@ export function ReferenceFields(
         helpUrl={
           `${help.ROOT_URL}/Reference.html#property-keys`
         }
+        parent={props.instance}
+        property="keys"
         newInstanceDefinitions={
-          newinstancing.forKey(
-            props.instance
-          )
+          newinstancing.FOR_KEY
         }
         snapItems={
           props.snapInstance.keys

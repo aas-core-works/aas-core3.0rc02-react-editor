@@ -13,8 +13,8 @@ import * as aas from "@aas-core-works/aas-core3.0rc02-typescript";
 import * as React from "react";
 
 import * as fields from '../fields';
-import * as newinstancing from '../../newinstancing.generated';
 import * as help from './help.generated';
+import * as newinstancing from '../../newinstancing.generated';
 
 export function ValueReferencePairFields(
   props: {
@@ -42,6 +42,8 @@ export function ValueReferencePairFields(
         helpUrl={
           `${help.ROOT_URL}/Value_reference_pair.html#property-value_id`
         }
+        parent={props.instance}
+        property="valueId"
         snapInstance={
           props.snapInstance.valueId
         }
@@ -49,9 +51,7 @@ export function ValueReferencePairFields(
           props.instance.valueId
         }
         newInstanceDefinitions={
-          newinstancing.forReference(
-            props.instance
-          )
+          newinstancing.FOR_REFERENCE
         }
         setInstance={
           (instance) => {

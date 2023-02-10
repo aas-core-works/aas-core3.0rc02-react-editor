@@ -13,8 +13,8 @@ import * as aas from "@aas-core-works/aas-core3.0rc02-typescript";
 import * as React from "react";
 
 import * as fields from '../fields';
-import * as newinstancing from '../../newinstancing.generated';
 import * as help from './help.generated';
+import * as newinstancing from '../../newinstancing.generated';
 
 export function EmbeddedDataSpecificationFields(
   props: {
@@ -29,6 +29,8 @@ export function EmbeddedDataSpecificationFields(
         helpUrl={
           `${help.ROOT_URL}/Embedded_data_specification.html#property-data_specification`
         }
+        parent={props.instance}
+        property="dataSpecification"
         snapInstance={
           props.snapInstance.dataSpecification
         }
@@ -36,9 +38,7 @@ export function EmbeddedDataSpecificationFields(
           props.instance.dataSpecification
         }
         newInstanceDefinitions={
-          newinstancing.forReference(
-            props.instance
-          )
+          newinstancing.FOR_REFERENCE
         }
         setInstance={
           (instance) => {
@@ -52,6 +52,8 @@ export function EmbeddedDataSpecificationFields(
         helpUrl={
           `${help.ROOT_URL}/Embedded_data_specification.html#property-data_specification_content`
         }
+        parent={props.instance}
+        property="dataSpecificationContent"
         snapInstance={
           props.snapInstance.dataSpecificationContent
         }
@@ -59,9 +61,7 @@ export function EmbeddedDataSpecificationFields(
           props.instance.dataSpecificationContent
         }
         newInstanceDefinitions={
-          newinstancing.forDataSpecificationContent(
-            props.instance
-          )
+          newinstancing.FOR_DATA_SPECIFICATION_CONTENT
         }
         setInstance={
           (instance) => {

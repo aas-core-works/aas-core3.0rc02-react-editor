@@ -98,7 +98,6 @@ export class MIMETypeParameters {
     name = asciiLowercase(String(name));
     value = String(value);
 
-    // TODO: fix this down the line
     if (!solelyContainsHTTPTokenCodePoints(name)) {
       throw new Error(
         `Invalid MIME type parameter name "${name}": ` +

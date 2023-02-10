@@ -10,6 +10,8 @@ export function EmbeddedInstanceOptional<ClassT extends aas.types.Class>(
   props: {
     label: string,
     helpUrl: string | null,
+    parent: aas.types.Class,
+    property: string,
     snapInstance: Readonly<ClassT | null>,
     instance: ClassT | null,
     newInstanceDefinitions: Array<newinstancing.Definition<ClassT>>,
@@ -25,7 +27,12 @@ export function EmbeddedInstanceOptional<ClassT extends aas.types.Class>(
             <button
               key={definition.label}
               onClick={() => {
-                props.setInstance(definition.factory())
+                props.setInstance(
+                  definition.factory(
+                    props.parent,
+                    [props.property]
+                  )
+                );
               }
               }>➕ {definition.label}
             </button>

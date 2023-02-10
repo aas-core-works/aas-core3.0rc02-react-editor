@@ -13,8 +13,8 @@ import * as aas from "@aas-core-works/aas-core3.0rc02-typescript";
 import * as React from "react";
 
 import * as fields from '../fields';
-import * as newinstancing from '../../newinstancing.generated';
 import * as help from './help.generated';
+import * as newinstancing from '../../newinstancing.generated';
 
 export function DataSpecificationIec61360Fields(
   props: {
@@ -29,10 +29,10 @@ export function DataSpecificationIec61360Fields(
         helpUrl={
           `${help.ROOT_URL}/Data_specification_IEC_61360.html#property-preferred_name`
         }
+        parent={props.instance}
+        property="preferredName"
         newInstanceDefinitions={
-          newinstancing.forLangString(
-            props.instance
-          )
+          newinstancing.FOR_LANG_STRING
         }
         snapItems={
           props.snapInstance.preferredName
@@ -52,10 +52,10 @@ export function DataSpecificationIec61360Fields(
         helpUrl={
           `${help.ROOT_URL}/Data_specification_IEC_61360.html#property-short_name`
         }
+        parent={props.instance}
+        property="shortName"
         newInstanceDefinitions={
-          newinstancing.forLangString(
-            props.instance
-          )
+          newinstancing.FOR_LANG_STRING
         }
         snapItems={
           props.snapInstance.shortName
@@ -88,6 +88,8 @@ export function DataSpecificationIec61360Fields(
         helpUrl={
           `${help.ROOT_URL}/Data_specification_IEC_61360.html#property-unit_id`
         }
+        parent={props.instance}
+        property="unitId"
         snapInstance={
           props.snapInstance.unitId
         }
@@ -95,9 +97,7 @@ export function DataSpecificationIec61360Fields(
           props.instance.unitId
         }
         newInstanceDefinitions={
-          newinstancing.forReference(
-            props.instance
-          )
+          newinstancing.FOR_REFERENCE
         }
         setInstance={
           (instance) => {
@@ -152,10 +152,10 @@ export function DataSpecificationIec61360Fields(
         helpUrl={
           `${help.ROOT_URL}/Data_specification_IEC_61360.html#property-definition`
         }
+        parent={props.instance}
+        property="definition"
         newInstanceDefinitions={
-          newinstancing.forLangString(
-            props.instance
-          )
+          newinstancing.FOR_LANG_STRING
         }
         snapItems={
           props.snapInstance.definition
@@ -188,6 +188,8 @@ export function DataSpecificationIec61360Fields(
         helpUrl={
           `${help.ROOT_URL}/Data_specification_IEC_61360.html#property-value_list`
         }
+        parent={props.instance}
+        property="valueList"
         snapInstance={
           props.snapInstance.valueList
         }
@@ -195,9 +197,7 @@ export function DataSpecificationIec61360Fields(
           props.instance.valueList
         }
         newInstanceDefinitions={
-          newinstancing.forValueList(
-            props.instance
-          )
+          newinstancing.FOR_VALUE_LIST
         }
         setInstance={
           (instance) => {

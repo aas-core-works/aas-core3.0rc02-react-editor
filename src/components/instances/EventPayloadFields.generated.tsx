@@ -13,8 +13,8 @@ import * as aas from "@aas-core-works/aas-core3.0rc02-typescript";
 import * as React from "react";
 
 import * as fields from '../fields';
-import * as newinstancing from '../../newinstancing.generated';
 import * as help from './help.generated';
+import * as newinstancing from '../../newinstancing.generated';
 
 export function EventPayloadFields(
   props: {
@@ -29,6 +29,8 @@ export function EventPayloadFields(
         helpUrl={
           `${help.ROOT_URL}/Event_payload.html#property-source`
         }
+        parent={props.instance}
+        property="source"
         snapInstance={
           props.snapInstance.source
         }
@@ -36,9 +38,7 @@ export function EventPayloadFields(
           props.instance.source
         }
         newInstanceDefinitions={
-          newinstancing.forReference(
-            props.instance
-          )
+          newinstancing.FOR_REFERENCE
         }
         setInstance={
           (instance) => {
@@ -52,6 +52,8 @@ export function EventPayloadFields(
         helpUrl={
           `${help.ROOT_URL}/Event_payload.html#property-source_semantic_id`
         }
+        parent={props.instance}
+        property="sourceSemanticId"
         snapInstance={
           props.snapInstance.sourceSemanticId
         }
@@ -59,9 +61,7 @@ export function EventPayloadFields(
           props.instance.sourceSemanticId
         }
         newInstanceDefinitions={
-          newinstancing.forReference(
-            props.instance
-          )
+          newinstancing.FOR_REFERENCE
         }
         setInstance={
           (instance) => {
@@ -75,6 +75,8 @@ export function EventPayloadFields(
         helpUrl={
           `${help.ROOT_URL}/Event_payload.html#property-observable_reference`
         }
+        parent={props.instance}
+        property="observableReference"
         snapInstance={
           props.snapInstance.observableReference
         }
@@ -82,9 +84,7 @@ export function EventPayloadFields(
           props.instance.observableReference
         }
         newInstanceDefinitions={
-          newinstancing.forReference(
-            props.instance
-          )
+          newinstancing.FOR_REFERENCE
         }
         setInstance={
           (instance) => {
@@ -98,6 +98,8 @@ export function EventPayloadFields(
         helpUrl={
           `${help.ROOT_URL}/Event_payload.html#property-observable_semantic_id`
         }
+        parent={props.instance}
+        property="observableSemanticId"
         snapInstance={
           props.snapInstance.observableSemanticId
         }
@@ -105,9 +107,7 @@ export function EventPayloadFields(
           props.instance.observableSemanticId
         }
         newInstanceDefinitions={
-          newinstancing.forReference(
-            props.instance
-          )
+          newinstancing.FOR_REFERENCE
         }
         setInstance={
           (instance) => {
@@ -134,6 +134,8 @@ export function EventPayloadFields(
         helpUrl={
           `${help.ROOT_URL}/Event_payload.html#property-subject_id`
         }
+        parent={props.instance}
+        property="subjectId"
         snapInstance={
           props.snapInstance.subjectId
         }
@@ -141,9 +143,7 @@ export function EventPayloadFields(
           props.instance.subjectId
         }
         newInstanceDefinitions={
-          newinstancing.forReference(
-            props.instance
-          )
+          newinstancing.FOR_REFERENCE
         }
         setInstance={
           (instance) => {

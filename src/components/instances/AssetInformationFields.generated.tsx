@@ -13,8 +13,8 @@ import * as aas from "@aas-core-works/aas-core3.0rc02-typescript";
 import * as React from "react";
 
 import * as fields from '../fields';
-import * as newinstancing from '../../newinstancing.generated';
 import * as help from './help.generated';
+import * as newinstancing from '../../newinstancing.generated';
 
 export function AssetInformationFields(
   props: {
@@ -44,6 +44,8 @@ export function AssetInformationFields(
         helpUrl={
           `${help.ROOT_URL}/Asset_information.html#property-global_asset_id`
         }
+        parent={props.instance}
+        property="globalAssetId"
         snapInstance={
           props.snapInstance.globalAssetId
         }
@@ -51,9 +53,7 @@ export function AssetInformationFields(
           props.instance.globalAssetId
         }
         newInstanceDefinitions={
-          newinstancing.forReference(
-            props.instance
-          )
+          newinstancing.FOR_REFERENCE
         }
         setInstance={
           (instance) => {
@@ -67,10 +67,10 @@ export function AssetInformationFields(
         helpUrl={
           `${help.ROOT_URL}/Asset_information.html#property-specific_asset_ids`
         }
+        parent={props.instance}
+        property="specificAssetIds"
         newInstanceDefinitions={
-          newinstancing.forSpecificAssetId(
-            props.instance
-          )
+          newinstancing.FOR_SPECIFIC_ASSET_ID
         }
         snapItems={
           props.snapInstance.specificAssetIds
@@ -90,6 +90,8 @@ export function AssetInformationFields(
         helpUrl={
           `${help.ROOT_URL}/Asset_information.html#property-default_thumbnail`
         }
+        parent={props.instance}
+        property="defaultThumbnail"
         snapInstance={
           props.snapInstance.defaultThumbnail
         }
@@ -97,9 +99,7 @@ export function AssetInformationFields(
           props.instance.defaultThumbnail
         }
         newInstanceDefinitions={
-          newinstancing.forResource(
-            props.instance
-          )
+          newinstancing.FOR_RESOURCE
         }
         setInstance={
           (instance) => {

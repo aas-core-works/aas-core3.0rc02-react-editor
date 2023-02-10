@@ -13,8 +13,8 @@ import * as aas from "@aas-core-works/aas-core3.0rc02-typescript";
 import * as React from "react";
 
 import * as fields from '../fields';
-import * as newinstancing from '../../newinstancing.generated';
 import * as help from './help.generated';
+import * as newinstancing from '../../newinstancing.generated';
 
 export function EnvironmentFields(
   props: {
@@ -29,10 +29,10 @@ export function EnvironmentFields(
         helpUrl={
           `${help.ROOT_URL}/Environment.html#property-asset_administration_shells`
         }
+        parent={props.instance}
+        property="assetAdministrationShells"
         newInstanceDefinitions={
-          newinstancing.forAssetAdministrationShell(
-            props.instance
-          )
+          newinstancing.FOR_ASSET_ADMINISTRATION_SHELL
         }
         snapItems={
           props.snapInstance.assetAdministrationShells
@@ -52,10 +52,10 @@ export function EnvironmentFields(
         helpUrl={
           `${help.ROOT_URL}/Environment.html#property-submodels`
         }
+        parent={props.instance}
+        property="submodels"
         newInstanceDefinitions={
-          newinstancing.forSubmodel(
-            props.instance
-          )
+          newinstancing.FOR_SUBMODEL
         }
         snapItems={
           props.snapInstance.submodels
@@ -75,10 +75,10 @@ export function EnvironmentFields(
         helpUrl={
           `${help.ROOT_URL}/Environment.html#property-concept_descriptions`
         }
+        parent={props.instance}
+        property="conceptDescriptions"
         newInstanceDefinitions={
-          newinstancing.forConceptDescription(
-            props.instance
-          )
+          newinstancing.FOR_CONCEPT_DESCRIPTION
         }
         snapItems={
           props.snapInstance.conceptDescriptions

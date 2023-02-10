@@ -1,6 +1,7 @@
 import * as aas from "@aas-core-works/aas-core3.0rc02-typescript";
 import * as React from 'react'
 
+import * as enhancing from "../enhancing.generated";
 import * as model from "../model";
 import * as widgets from "./widgets";
 
@@ -49,9 +50,10 @@ export function ImportFromJsonButton(props: { state: model.State }) {
                   );
                 } else {
                   // noinspection UnnecessaryLocalVariableJS
-                  const environment = model.enhance(
+                  const environment = enhancing.enhance(
                     environmentAndErrors.mustValue(),
-                    null
+                    null,
+                    []
                   );
 
                   props.state.environment = environment;

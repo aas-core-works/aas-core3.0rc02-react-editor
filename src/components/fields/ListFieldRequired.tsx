@@ -6,11 +6,14 @@ import * as newinstancing from "../../newinstancing.generated";
 
 import {HelpLink} from "./HelpLink";
 import {ListItem} from "./ListItem"
+import * as enhancing from "../../enhancing.generated";
 
 export function ListFieldRequired<ClassT extends aas.types.Class>(
   props: {
     label: string,
     helpUrl: string | null,
+    parent: aas.types.Class,
+    property: string,
     newInstanceDefinitions: Array<newinstancing.Definition<ClassT>>,
     snapItems: ReadonlyArray<ClassT>,
     items: Readonly<Array<ClassT>>,
@@ -27,7 +30,7 @@ export function ListFieldRequired<ClassT extends aas.types.Class>(
           props.snapItems.map(
             (snapItem, i) => {
               const item = props.items[i];
-              const ourId = model.getOurId(model.mustAsEnhanced(item));
+              const ourId = model.getOurId(item);
 
               return (
                 <ListItem
@@ -36,9 +39,10 @@ export function ListFieldRequired<ClassT extends aas.types.Class>(
                   instance={item}
                   remove={
                     () => {
-                      let newItems = model.removeFromContainer(
+                      const newItems = model.removeFromContainer(
                         props.items,
-                        ourId
+                        ourId,
+                        false
                       );
 
                       if (newItems === null) {
@@ -64,9 +68,17 @@ export function ListFieldRequired<ClassT extends aas.types.Class>(
                 key={definition.label}
                 onClick={
                   () => {
+                    const newItem = definition.factory(
+                      props.parent,
+                      [
+                        props.property,
+                        props.items === null ? 0 : props.items.length
+                      ]
+                    );
+
                     props.setItems(
                       model.addToContainer(
-                        definition.factory(),
+                        newItem,
                         props.items
                       )
                     );

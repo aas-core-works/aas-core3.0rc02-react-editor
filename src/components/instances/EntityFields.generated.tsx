@@ -13,8 +13,8 @@ import * as aas from "@aas-core-works/aas-core3.0rc02-typescript";
 import * as React from "react";
 
 import * as fields from '../fields';
-import * as newinstancing from '../../newinstancing.generated';
 import * as help from './help.generated';
+import * as newinstancing from '../../newinstancing.generated';
 
 export function EntityFields(
   props: {
@@ -29,10 +29,10 @@ export function EntityFields(
         helpUrl={
           `${help.ROOT_URL}/Entity.html#property-extensions`
         }
+        parent={props.instance}
+        property="extensions"
         newInstanceDefinitions={
-          newinstancing.forExtension(
-            props.instance
-          )
+          newinstancing.FOR_EXTENSION
         }
         snapItems={
           props.snapInstance.extensions
@@ -78,10 +78,10 @@ export function EntityFields(
         helpUrl={
           `${help.ROOT_URL}/Entity.html#property-display_name`
         }
+        parent={props.instance}
+        property="displayName"
         newInstanceDefinitions={
-          newinstancing.forLangString(
-            props.instance
-          )
+          newinstancing.FOR_LANG_STRING
         }
         snapItems={
           props.snapInstance.displayName
@@ -101,10 +101,10 @@ export function EntityFields(
         helpUrl={
           `${help.ROOT_URL}/Entity.html#property-description`
         }
+        parent={props.instance}
+        property="description"
         newInstanceDefinitions={
-          newinstancing.forLangString(
-            props.instance
-          )
+          newinstancing.FOR_LANG_STRING
         }
         snapItems={
           props.snapInstance.description
@@ -152,6 +152,8 @@ export function EntityFields(
         helpUrl={
           `${help.ROOT_URL}/Entity.html#property-semantic_id`
         }
+        parent={props.instance}
+        property="semanticId"
         snapInstance={
           props.snapInstance.semanticId
         }
@@ -159,9 +161,7 @@ export function EntityFields(
           props.instance.semanticId
         }
         newInstanceDefinitions={
-          newinstancing.forReference(
-            props.instance
-          )
+          newinstancing.FOR_REFERENCE
         }
         setInstance={
           (instance) => {
@@ -175,10 +175,10 @@ export function EntityFields(
         helpUrl={
           `${help.ROOT_URL}/Entity.html#property-supplemental_semantic_ids`
         }
+        parent={props.instance}
+        property="supplementalSemanticIds"
         newInstanceDefinitions={
-          newinstancing.forReference(
-            props.instance
-          )
+          newinstancing.FOR_REFERENCE
         }
         snapItems={
           props.snapInstance.supplementalSemanticIds
@@ -198,10 +198,10 @@ export function EntityFields(
         helpUrl={
           `${help.ROOT_URL}/Entity.html#property-qualifiers`
         }
+        parent={props.instance}
+        property="qualifiers"
         newInstanceDefinitions={
-          newinstancing.forQualifier(
-            props.instance
-          )
+          newinstancing.FOR_QUALIFIER
         }
         snapItems={
           props.snapInstance.qualifiers
@@ -221,10 +221,10 @@ export function EntityFields(
         helpUrl={
           `${help.ROOT_URL}/Entity.html#property-embedded_data_specifications`
         }
+        parent={props.instance}
+        property="embeddedDataSpecifications"
         newInstanceDefinitions={
-          newinstancing.forEmbeddedDataSpecification(
-            props.instance
-          )
+          newinstancing.FOR_EMBEDDED_DATA_SPECIFICATION
         }
         snapItems={
           props.snapInstance.embeddedDataSpecifications
@@ -244,10 +244,10 @@ export function EntityFields(
         helpUrl={
           `${help.ROOT_URL}/Entity.html#property-statements`
         }
+        parent={props.instance}
+        property="statements"
         newInstanceDefinitions={
-          newinstancing.forSubmodelElement(
-            props.instance
-          )
+          newinstancing.FOR_SUBMODEL_ELEMENT
         }
         snapItems={
           props.snapInstance.statements
@@ -282,6 +282,8 @@ export function EntityFields(
         helpUrl={
           `${help.ROOT_URL}/Entity.html#property-global_asset_id`
         }
+        parent={props.instance}
+        property="globalAssetId"
         snapInstance={
           props.snapInstance.globalAssetId
         }
@@ -289,9 +291,7 @@ export function EntityFields(
           props.instance.globalAssetId
         }
         newInstanceDefinitions={
-          newinstancing.forReference(
-            props.instance
-          )
+          newinstancing.FOR_REFERENCE
         }
         setInstance={
           (instance) => {
@@ -305,6 +305,8 @@ export function EntityFields(
         helpUrl={
           `${help.ROOT_URL}/Entity.html#property-specific_asset_id`
         }
+        parent={props.instance}
+        property="specificAssetId"
         snapInstance={
           props.snapInstance.specificAssetId
         }
@@ -312,9 +314,7 @@ export function EntityFields(
           props.instance.specificAssetId
         }
         newInstanceDefinitions={
-          newinstancing.forSpecificAssetId(
-            props.instance
-          )
+          newinstancing.FOR_SPECIFIC_ASSET_ID
         }
         setInstance={
           (instance) => {

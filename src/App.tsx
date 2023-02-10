@@ -1,8 +1,9 @@
-import * as valtio from "valtio";
 import * as React from 'react'
+import * as valtio from "valtio";
 
 import * as components from './components'
 import * as model from "./model"
+import * as verification from "./verification"
 
 import './App.css'
 
@@ -20,25 +21,85 @@ function useUnload<FuncT extends (event: BeforeUnloadEvent) => any>(
   }, [callback]);
 }
 
-function App() {
-  const snap = valtio.useSnapshot(model.STATE) as Readonly<typeof model.STATE>;
+const ERROR_CAP = 100;
+
+function App(props: {
+  state: model.State,
+  verification: verification.Verification
+}) {
+  const snapState =
+    valtio.useSnapshot(props.state) as Readonly<typeof props.state>;
 
   useUnload((event) => {
     event.preventDefault();
   })
 
+  React.useEffect(() => {
+      const continuousVerification = new verification.ContinuousVerification(
+        props.verification,
+        ERROR_CAP
+      );
+
+      continuousVerification.start()
+
+      return () => {continuousVerification.stop()};
+    },
+    [props.verification]
+  )
+
+  React.useEffect(() => {
+      // noinspection UnnecessaryLocalVariableJS
+      const unsubscribe = valtio.subscribe(
+        props.state,
+        (ops) => {
+          for (const op of ops) {
+            if (op[1].length == 0 || op[1][0] !== 'environment') {
+              // We ignore all the changes not done to the environment.
+              continue;
+            }
+
+            if (op[0] !== 'set') {
+              console.error(
+                `Unexpected op code ${op[0]} in the environment change`,
+                op
+              );
+              throw new Error("Assertion violated");
+            }
+
+            const [_, path, value, prevValue] = op;
+
+            const pathInEnvironment = path.slice(1);
+            verification.updateVerificationOnStateChange(
+              props.state.environment,
+              pathInEnvironment,
+              value,
+              prevValue,
+              new Date().getTime(),
+              props.verification
+            );
+          }
+        }
+      );
+
+      return unsubscribe;
+    },
+    [props.state]
+  )
+
   return (
     <div className="App">
+      <div id="toolbar">
+        <components.NewButton state={props.state}/>
+        <components.ExportAsJsonButton snap={snapState}/>
+        <components.ImportFromJsonButton state={props.state}/>
+      </div>
+
       <components.Environment
-        snapInstance={snap.environment}
-        instance={model.STATE.environment}
+        snapInstance={snapState.environment}
+        instance={props.state.environment}
       />
 
-      <div id="toolbar">
-        <components.NewButton state={model.STATE}/>
-        <components.ExportAsJsonButton snap={snap}/>
-        <components.ImportFromJsonButton state={model.STATE}/>
-      </div>
+      <components.Errors verification={props.verification}/>
     </div>
   )
 }

@@ -13,6 +13,7 @@ import codegen.generate_emptory
 import codegen.generate_instances
 import codegen.generate_newinstancing
 import codegen.generate_titling
+import codegen.generate_enhancing
 
 
 def main() -> int:
@@ -57,6 +58,11 @@ def main() -> int:
 
     (codegen.common.REPO_ROOT / "src/titling.generated.ts").write_text(
         codegen.generate_titling.generate(symbol_table=symbol_table) + "\n",
+        encoding="utf-8",
+    )
+
+    (codegen.common.REPO_ROOT / "src/enhancing.generated.ts").write_text(
+        codegen.generate_enhancing.generate(symbol_table=symbol_table) + "\n",
         encoding="utf-8",
     )
 

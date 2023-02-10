@@ -149,7 +149,7 @@ def _generate_field_for_property(
             if our_type.interface is not None:
                 embedded_type_name = typescript_naming.interface_name(our_type.name)
 
-            newinstancing_for_function = typescript_naming.function_name(
+            newinstancing_for_const = typescript_naming.constant_name(
                 Identifier(f"for_{our_type.name}")
             )
 
@@ -160,6 +160,8 @@ def _generate_field_for_property(
 {I}helpUrl={{
 {II}{help_url_literal}
 {I}}}
+{I}parent={{props.instance}}
+{I}property={typescript_common.string_literal(prop_name)}
 {I}snapInstance={{
 {II}props.snapInstance.{prop_name}
 {I}}}
@@ -167,9 +169,7 @@ def _generate_field_for_property(
 {II}props.instance.{prop_name}
 {I}}}
 {I}newInstanceDefinitions={{
-{II}newinstancing.{newinstancing_for_function}(
-{III}props.instance
-{II})
+{II}newinstancing.{newinstancing_for_const}
 {I}}}
 {I}setInstance={{
 {II}(instance) => {{
@@ -198,7 +198,7 @@ def _generate_field_for_property(
         else:
             items_type = typescript_naming.class_name(items_cls.name)
 
-        newinstancing_for_function = typescript_naming.function_name(
+        newinstancing_for_const = typescript_naming.constant_name(
             Identifier(f"for_{items_cls.name}")
         )
 
@@ -209,10 +209,10 @@ def _generate_field_for_property(
 {I}helpUrl={{
 {II}{help_url_literal}
 {I}}}
+{I}parent={{props.instance}}
+{I}property={typescript_common.string_literal(prop_name)}
 {I}newInstanceDefinitions={{
-{II}newinstancing.{newinstancing_for_function}(
-{III}props.instance
-{II})
+{II}newinstancing.{newinstancing_for_const}
 {I}}}
 {I}snapItems={{
 {II}props.snapInstance.{prop_name}
@@ -260,8 +260,8 @@ import * as aas from "@aas-core-works/aas-core3.0rc02-typescript";
 import * as React from "react";
 
 import * as fields from '../fields';
-import * as newinstancing from '../../newinstancing.generated';
-import * as help from './help.generated';"""
+import * as help from './help.generated';
+import * as newinstancing from '../../newinstancing.generated';"""
         ),
         Stripped(
             f"""\

@@ -13,8 +13,8 @@ import * as aas from "@aas-core-works/aas-core3.0rc02-typescript";
 import * as React from "react";
 
 import * as fields from '../fields';
-import * as newinstancing from '../../newinstancing.generated';
 import * as help from './help.generated';
+import * as newinstancing from '../../newinstancing.generated';
 
 export function BasicEventElementFields(
   props: {
@@ -29,10 +29,10 @@ export function BasicEventElementFields(
         helpUrl={
           `${help.ROOT_URL}/Basic_event_element.html#property-extensions`
         }
+        parent={props.instance}
+        property="extensions"
         newInstanceDefinitions={
-          newinstancing.forExtension(
-            props.instance
-          )
+          newinstancing.FOR_EXTENSION
         }
         snapItems={
           props.snapInstance.extensions
@@ -78,10 +78,10 @@ export function BasicEventElementFields(
         helpUrl={
           `${help.ROOT_URL}/Basic_event_element.html#property-display_name`
         }
+        parent={props.instance}
+        property="displayName"
         newInstanceDefinitions={
-          newinstancing.forLangString(
-            props.instance
-          )
+          newinstancing.FOR_LANG_STRING
         }
         snapItems={
           props.snapInstance.displayName
@@ -101,10 +101,10 @@ export function BasicEventElementFields(
         helpUrl={
           `${help.ROOT_URL}/Basic_event_element.html#property-description`
         }
+        parent={props.instance}
+        property="description"
         newInstanceDefinitions={
-          newinstancing.forLangString(
-            props.instance
-          )
+          newinstancing.FOR_LANG_STRING
         }
         snapItems={
           props.snapInstance.description
@@ -152,6 +152,8 @@ export function BasicEventElementFields(
         helpUrl={
           `${help.ROOT_URL}/Basic_event_element.html#property-semantic_id`
         }
+        parent={props.instance}
+        property="semanticId"
         snapInstance={
           props.snapInstance.semanticId
         }
@@ -159,9 +161,7 @@ export function BasicEventElementFields(
           props.instance.semanticId
         }
         newInstanceDefinitions={
-          newinstancing.forReference(
-            props.instance
-          )
+          newinstancing.FOR_REFERENCE
         }
         setInstance={
           (instance) => {
@@ -175,10 +175,10 @@ export function BasicEventElementFields(
         helpUrl={
           `${help.ROOT_URL}/Basic_event_element.html#property-supplemental_semantic_ids`
         }
+        parent={props.instance}
+        property="supplementalSemanticIds"
         newInstanceDefinitions={
-          newinstancing.forReference(
-            props.instance
-          )
+          newinstancing.FOR_REFERENCE
         }
         snapItems={
           props.snapInstance.supplementalSemanticIds
@@ -198,10 +198,10 @@ export function BasicEventElementFields(
         helpUrl={
           `${help.ROOT_URL}/Basic_event_element.html#property-qualifiers`
         }
+        parent={props.instance}
+        property="qualifiers"
         newInstanceDefinitions={
-          newinstancing.forQualifier(
-            props.instance
-          )
+          newinstancing.FOR_QUALIFIER
         }
         snapItems={
           props.snapInstance.qualifiers
@@ -221,10 +221,10 @@ export function BasicEventElementFields(
         helpUrl={
           `${help.ROOT_URL}/Basic_event_element.html#property-embedded_data_specifications`
         }
+        parent={props.instance}
+        property="embeddedDataSpecifications"
         newInstanceDefinitions={
-          newinstancing.forEmbeddedDataSpecification(
-            props.instance
-          )
+          newinstancing.FOR_EMBEDDED_DATA_SPECIFICATION
         }
         snapItems={
           props.snapInstance.embeddedDataSpecifications
@@ -244,6 +244,8 @@ export function BasicEventElementFields(
         helpUrl={
           `${help.ROOT_URL}/Basic_event_element.html#property-observed`
         }
+        parent={props.instance}
+        property="observed"
         snapInstance={
           props.snapInstance.observed
         }
@@ -251,9 +253,7 @@ export function BasicEventElementFields(
           props.instance.observed
         }
         newInstanceDefinitions={
-          newinstancing.forReference(
-            props.instance
-          )
+          newinstancing.FOR_REFERENCE
         }
         setInstance={
           (instance) => {
@@ -310,6 +310,8 @@ export function BasicEventElementFields(
         helpUrl={
           `${help.ROOT_URL}/Basic_event_element.html#property-message_broker`
         }
+        parent={props.instance}
+        property="messageBroker"
         snapInstance={
           props.snapInstance.messageBroker
         }
@@ -317,9 +319,7 @@ export function BasicEventElementFields(
           props.instance.messageBroker
         }
         newInstanceDefinitions={
-          newinstancing.forReference(
-            props.instance
-          )
+          newinstancing.FOR_REFERENCE
         }
         setInstance={
           (instance) => {

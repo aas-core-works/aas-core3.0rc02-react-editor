@@ -15,6 +15,7 @@ from aas_core_codegen.typescript import (
 from aas_core_codegen.typescript.common import (
     INDENT as I,
     INDENT2 as II,
+    INDENT3 as III,
 )
 
 import codegen.common
@@ -56,15 +57,19 @@ def _generate_for_class(
 new Definition(
 {I}{name_literal},
 {I}aas.types.{is_name},
-{I}() => model.enhance(
+{I}(
+{II}parent: aas.types.Class | null,
+{II}relativePathFromParent: Array<number | string>
+{I}) => enhancing.enhance(
 {II}emptory.{new_name}(),
-{II}parent
+{II}parent,
+{II}relativePathFromParent
 {I})
 )"""
             )
         )
 
-    for_name = typescript_naming.function_name(Identifier(f"for_{cls.name}"))
+    for_name = typescript_naming.constant_name(Identifier(f"for_{cls.name}"))
 
     definition_type = (
         f"Definition<aas.types.{typescript_naming.interface_name(cls.name)}>"
@@ -76,13 +81,10 @@ new Definition(
 
     return Stripped(
         f"""\
-export function {for_name}(
-{I}parent: aas.types.Class | null
-): Array<{definition_type}> {{
-{I}return [
+export const {for_name} =
+{I}[
 {I}{indent_but_first_line(definitions_joined, I)}
-{I}];
-}}"""
+{I}];"""
     )
 
 
@@ -111,15 +113,12 @@ def generate(symbol_table: intermediate.SymbolTable) -> Stripped:
 import * as aas from "@aas-core-works/aas-core3.0rc02-typescript";
 
 import * as emptory from "./emptory.generated";
-import * as model from "./model";"""
+import * as enhancing from "./enhancing.generated";"""
         ),
         Stripped(
             f"""\
 /**
  * Define how to create a new instance of a class.
- *
- * @remarks
- * This definition is presumed in the context of a given parent instance.
  */
 export class Definition<ClassT extends aas.types.Class> {{
 {I}/**
@@ -135,12 +134,18 @@ export class Definition<ClassT extends aas.types.Class> {{
 {I}/**
 {I} * Function to create an empty instance of the class
 {I} */
-{I}factory: () => model.Enhanced<ClassT>;
+{I}factory: (
+{II}parent: aas.types.Class | null,
+{II}relativePathFromParent: Array<number | string>
+{I}) => enhancing.Enhanced<ClassT>;
 
 {I}constructor(
 {II}label: string,
 {II}isType: (instance: aas.types.Class) => boolean,
-{II}factory: () => model.Enhanced<ClassT>
+{II}factory: (
+{III}parent: aas.types.Class | null,
+{III}relativePathFromParent: Array<number | string>
+{II}) => enhancing.Enhanced<ClassT>
 {I}) {{
 {II}this.label = label;
 {II}this.isType = isType;
@@ -150,6 +155,10 @@ export class Definition<ClassT extends aas.types.Class> {{
         ),
     ]
 
+    id_set_of_our_types_in_properties = (
+        intermediate.collect_ids_of_our_types_in_properties(symbol_table=symbol_table)
+    )
+
     for cls in [
         our_type
         for our_type in symbol_table.our_types
@@ -157,7 +166,8 @@ export class Definition<ClassT extends aas.types.Class> {{
             our_type, (intermediate.AbstractClass, intermediate.ConcreteClass)
         )
     ]:
-        blocks.append(_generate_for_class(cls))
+        if id(cls) in id_set_of_our_types_in_properties:
+            blocks.append(_generate_for_class(cls))
 
     blocks.append(codegen.common.WARNING)
 
