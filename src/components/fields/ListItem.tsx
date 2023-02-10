@@ -3,13 +3,14 @@ import * as React from 'react';
 
 import * as titling from '../../titling.generated'
 import * as fielding from '../instances/fielding.generated'
-import * as model from "../../model"
 
 export function ListItem<ClassT extends aas.types.Class>(
   props: {
     snapInstance: Readonly<ClassT>,
     instance: ClassT,
-    remove: () => void
+    remove: () => void,
+    shiftLeft: (() => void) | null,
+    shiftRight: (() => void) | null
   }
 ) {
   return (
@@ -23,15 +24,35 @@ export function ListItem<ClassT extends aas.types.Class>(
             onClick={() => props.remove()}
           >🗑
           </button>
+
+          {
+            (props.shiftLeft !== null) && (
+              <button
+                className="aas-shift-left-button"
+                onClick={() => props.shiftLeft!()}
+              >⇡
+              </button>
+            )
+          }
+
+          {
+            (props.shiftRight !== null) && (
+              <button
+                className="aas-shift-right-button"
+                onClick={() => props.shiftRight!()}
+              >⇣
+              </button>
+            )
+          }
         </summary>
 
         <ul>
-        {
-          fielding.componentFor(
-            props.instance,
-            props.snapInstance
-          )
-        }
+          {
+            fielding.componentFor(
+              props.instance,
+              props.snapInstance
+            )
+          }
         </ul>
       </details>
     </li>

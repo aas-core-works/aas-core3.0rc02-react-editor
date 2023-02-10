@@ -6,6 +6,8 @@ import * as model from "./model"
 import * as verification from "./verification"
 
 import './App.css'
+import * as enhancing from "./enhancing.generated";
+import * as emptory from "./emptory.generated";
 
 function useUnload<FuncT extends (event: BeforeUnloadEvent) => any>(
   func: FuncT
@@ -42,7 +44,9 @@ function App(props: {
 
       continuousVerification.start()
 
-      return () => {continuousVerification.stop()};
+      return () => {
+        continuousVerification.stop()
+      };
     },
     [props.verification]
   )
@@ -77,6 +81,11 @@ function App(props: {
               new Date().getTime(),
               props.verification
             );
+
+            verification.updatePathVersionOnStateChange(
+              props.verification.instancesPathVersioning,
+              pathInEnvironment
+            );
           }
         }
       );
@@ -99,7 +108,10 @@ function App(props: {
         instance={props.state.environment}
       />
 
-      <components.Errors verification={props.verification}/>
+      <components.Errors
+        verification={props.verification}
+        snapEnvironment={snapState.environment}
+      />
     </div>
   )
 }

@@ -23,7 +23,9 @@
  */
 import * as aas from "@aas-core-works/aas-core3.0rc02-typescript";
 import * as valtio from "valtio";
+
 import * as debugconf from "./debugconf";
+import * as incrementalid from "./incrementalid";
 import * as model from "./model";
 
 /**
@@ -33,11 +35,25 @@ class Versioning {
   version = 0;
 }
 
+class TimestampedInstance {
+  constructor(public instance: aas.types.Class, public timestamp: number) {
+    // Intentionally empty.
+  }
+}
+
 /**
  * Map the priorities for the verification.
  */
 class VerificationMap {
-  private readonly map = new Map<aas.types.Class, number>();
+  // NOTE (mristin, 2023-02-10): Why our IDs?
+  // We have to use our IDs here since valtio messes up the references to
+  // the objects. Namely, when we subscribe to change notifications,
+  // we get different reference if we follow the change path from an environment
+  // (which returns a proxy wrapper instead of the target object), and the value
+  // in the notification itself (which returns the target object).
+
+  // ourId -> enqueued instance, timestamp of the change
+  private readonly map = new Map<string, TimestampedInstance>();
   readonly versioning: Versioning = valtio.proxy(new Versioning());
 
   /**
@@ -61,16 +77,32 @@ class VerificationMap {
   ): void {
     let shouldBumpVersion = false;
     for (const instance of instances) {
-      // We add the check here for runtime types since bugs with valtio proxies
-      // are really difficult to debug otherwise.
-      if (!(instance instanceof aas.types.Class)) {
-        console.error("Expected an instance, but got something else", instance);
-        throw new Error("Assertion violated");
+      // NOTE (mristin, 2023-02-10):
+      // This check is necessary here since it is a nightmare to debug
+      // valtio otherwise. If we ever get a non-proxy in the container,
+      // the relative paths will not properly trigger the downstream changes!
+      //
+      // See: https://github.com/pmndrs/valtio/discussions/473
+      if (typeof valtio.getVersion(instance) !== "number") {
+        console.error(
+          "Expected all the instances to be valtio proxies when updating " +
+            "the verification map, but got a non-proxy instance.",
+          instance.constructor.name,
+          instance
+        );
+        throw new Error("Assertion violation");
       }
 
-      const prevTimestamp = this.map.get(instance);
-      if (prevTimestamp === undefined || prevTimestamp < timestamp) {
-        this.map.set(instance, timestamp);
+      const ourId = model.getOurId(instance);
+
+      const prevEntry = this.map.get(ourId);
+      if (prevEntry !== undefined) {
+        if (prevEntry.timestamp < timestamp) {
+          this.map.set(ourId, new TimestampedInstance(instance, timestamp));
+          shouldBumpVersion = true;
+        }
+      } else {
+        this.map.set(ourId, new TimestampedInstance(instance, timestamp));
         shouldBumpVersion = true;
       }
     }
@@ -93,7 +125,7 @@ class VerificationMap {
   remove(instances: IterableIterator<aas.types.Class>): void {
     let shouldBumpVersion = false;
     for (const instance of instances) {
-      const removed = this.map.delete(instance);
+      const removed = this.map.delete(model.getOurId(instance));
       if (removed) {
         shouldBumpVersion = true;
       }
@@ -104,8 +136,8 @@ class VerificationMap {
     }
   }
 
-  overInstancesWithTimestamps(): IterableIterator<[aas.types.Class, number]> {
-    return this.map.entries();
+  overTimestampedInstances(): IterableIterator<TimestampedInstance> {
+    return this.map.values();
   }
 
   get empty(): boolean {
@@ -117,51 +149,56 @@ class VerificationMap {
   }
 }
 
+function stringifyPath(path: Array<number | string>): string {
+  if (path.length === 0) {
+    return "";
+  }
+
+  // NOTE (2023-02-10):
+  // See: https://stackoverflow.com/questions/16696632/most-efficient-way-to-concatenate-strings-in-javascript
+  // for string concatenation.
+  let result = "";
+
+  for (const segment of path) {
+    if (typeof segment === "string") {
+      result += `.${segment}`;
+    } else {
+      result += `[${segment}]`;
+    }
+  }
+
+  return result;
+}
+
 /**
  * Represent an error with a timestamp of the change.
  */
 export class TimestampedError {
   constructor(
     public message: string,
-    public path: Array<number | string>,
-    public timestamp: number
+    public instance: aas.types.Class,
+    public relativePathFromInstance: Array<number | string>,
+    public timestamp: number,
+    public guid = incrementalid.next()
   ) {}
 
   pathAsString(): string {
-    if (this.path.length === 0) {
-      return "";
-    }
+    const path = model.collectPath(this.instance);
+    path.push(...this.relativePathFromInstance);
 
-    // NOTE (2023-02-10):
-    // See: https://stackoverflow.com/questions/16696632/most-efficient-way-to-concatenate-strings-in-javascript
-    // for string concatenation.
-    let result = "";
-
-    for (const segment of this.path) {
-      if (typeof segment === "string") {
-        result += `.${segment}`;
-      } else {
-        result += `[${segment}]`;
-      }
-    }
-
-    return result;
+    return stringifyPath(path);
   }
-}
-
-function produceErrorKey(error: TimestampedError): string {
-  return `${error.pathAsString()}: ${error.message}`;
 }
 
 /**
  * Map the errors to the corresponding instances.
  */
 class ErrorMap {
-  // instance -> (error key -> error)
-  private readonly map = new Map<
-    aas.types.Class,
-    Map<string, TimestampedError>
-  >();
+  // NOTE (mristin, 2023-02-10):
+  // See the note "Why our IDs?" for why we use our IDs here as the key.
+
+  // Our ID -> (error key -> error)
+  private readonly map = new Map<string, Map<string, TimestampedError>>();
 
   readonly versioning: Versioning = valtio.proxy(new Versioning());
 
@@ -179,7 +216,7 @@ class ErrorMap {
 
     if (expectedErrorCount !== this.errorCount) {
       console.error(
-        `Counted ${expectedErrorCount} actual errors, ` +
+        `Counted ${expectedErrorCount} actual error(s), ` +
           `but errorCount is ${this.errorCount}`,
         this.map
       );
@@ -208,14 +245,18 @@ class ErrorMap {
     let shouldBumpVersion = false;
 
     for (const [instance, timestampedError] of instancesTimestampedErrors) {
-      const errorKey = produceErrorKey(timestampedError);
+      const errorKey =
+        stringifyPath(timestampedError.relativePathFromInstance) +
+        `: ${timestampedError.message}`;
 
-      let instanceErrors = this.map.get(instance);
+      const ourId = model.getOurId(instance);
+
+      let instanceErrors = this.map.get(ourId);
       if (instanceErrors === undefined) {
         instanceErrors = new Map<string, TimestampedError>();
         instanceErrors.set(errorKey, timestampedError);
+        this.map.set(ourId, instanceErrors);
 
-        this.map.set(instance, instanceErrors);
         this._errorCount++;
 
         shouldBumpVersion = true;
@@ -229,8 +270,6 @@ class ErrorMap {
         } else {
           if (previousTimestampError.timestamp < timestampedError.timestamp) {
             instanceErrors.set(errorKey, timestampedError);
-            this._errorCount++;
-
             shouldBumpVersion = true;
           }
         }
@@ -259,8 +298,10 @@ class ErrorMap {
   remove(instances: IterableIterator<aas.types.Class>): void {
     let shouldBumpVersion = false;
     for (const instance of instances) {
-      const instanceErrors = this.map.get(instance);
+      const ourId = model.getOurId(instance);
+      const instanceErrors = this.map.get(ourId);
       if (instanceErrors !== undefined) {
+        this.map.delete(ourId);
         this._errorCount -= instanceErrors.size;
         shouldBumpVersion = true;
       }
@@ -285,92 +326,6 @@ class ErrorMap {
       }
     }
   }
-}
-
-/**
- * Compare two timestamped errors, first on timestamps than on their paths, and
- * finally on their messages.
- *
- * @param that left operand
- * @param other right operand
- * @returns
- * * `that  < other => result  < 0`,
- * * `that == other => result == 0`, and
- * * `that  > other => result  > 0`
- */
-export function compareTimestampedErrors(
-  that: TimestampedError,
-  other: TimestampedError
-): number {
-  if (that.timestamp !== other.timestamp) {
-    // The most recent timestamp comes before the older timestamp.
-    // Therefore, we reverse the subtraction order here.
-    return other.timestamp - that.timestamp;
-  }
-
-  // We take the max, and then deal with `undefined` gracefully.
-  const n = Math.max(that.path.length, other.path.length);
-
-  for (let i = 0; i < n; ++i) {
-    const thatSegment = that.path[i];
-    const otherSegment = other.path[i];
-
-    if (thatSegment === undefined && otherSegment === undefined) {
-      // If we got so far, the paths were equal, so we compare the messages.
-      return that.message.localeCompare(other.message);
-    }
-
-    // The longer path is greater than the shorter path, everything else
-    // being equal.
-    if (thatSegment === undefined && otherSegment !== undefined) {
-      return -1;
-    } else if (thatSegment !== undefined && otherSegment === undefined) {
-      return 1;
-    } else {
-      // We impose an arbitrary comparison that index segments are less-than
-      // property segments.
-      if (typeof thatSegment === "number" && typeof otherSegment === "string") {
-        return -1;
-      } else if (
-        typeof thatSegment === "string" &&
-        typeof otherSegment === "number"
-      ) {
-        return 1;
-      } else if (
-        typeof thatSegment === "number" &&
-        typeof otherSegment === "number"
-      ) {
-        if (thatSegment !== otherSegment) {
-          return thatSegment - otherSegment;
-        } else {
-          // Continue, the path segments are equal thus far.
-        }
-      } else if (
-        typeof thatSegment === "string" &&
-        typeof otherSegment === "string"
-      ) {
-        // NOTE (mristin, 2023-02-03):
-        // JavaScript does not provide efficient `strcmp`, so we have to
-        // resort to two string comparisons.
-        if (thatSegment !== otherSegment) {
-          const thatSegmentNameIsSmaller = thatSegment < otherSegment;
-          return thatSegmentNameIsSmaller ? -1 : 1;
-        } else {
-          // Continue, the path segments are equal thus far.
-        }
-      } else {
-        console.error("Unhandled case", thatSegment, otherSegment);
-        throw new Error("Assertion violation");
-      }
-    }
-  }
-
-  console.error(
-    "Unhandled case, the function should have returned before",
-    that,
-    other
-  );
-  throw new Error("Assertion violation");
 }
 
 function* overInstanceAndItsAntecedents(
@@ -405,6 +360,11 @@ function* overInstanceAndItsDescendents(
 export class Verification {
   verificationMap = new VerificationMap();
   errorMap = new ErrorMap();
+
+  /**
+   * Updated every time a relative path in the environment changes.
+   */
+  instancesPathVersioning = valtio.proxy(new Versioning());
 
   /**
    * Enqueue the `instance` and all its antecedents for verification.
@@ -527,17 +487,17 @@ export class ContinuousVerification {
 
       // Pick most recent verification requests
 
-      const instancesTimestamps = Array.from(
-        context.verificationMap.overInstancesWithTimestamps()
+      const timestampedInstances = Array.from(
+        context.verificationMap.overTimestampedInstances()
       );
 
-      instancesTimestamps.sort((that, other) => {
+      timestampedInstances.sort((that, other) => {
         // The most recent change comes first, hence the reversed order of
         // operands in the subtraction.
-        return other[1] - that[1];
+        return other.timestamp - that.timestamp;
       });
 
-      const batch = instancesTimestamps.slice(0, 100);
+      const batch = timestampedInstances.slice(0, 100);
 
       const instancesTimestampedErrors = new Array<
         [aas.types.Class, TimestampedError]
@@ -545,14 +505,16 @@ export class ContinuousVerification {
 
       let reachedTheCap = false;
 
-      for (const [instance, timestamp] of batch) {
+      for (const { instance, timestamp } of batch) {
         for (const error of aas.verification.verify(instance, false)) {
-          const path = model.collectPath(instance);
-          path.push(...aasVerificationPathToArrayOfPrimitives(error.path));
-
           instancesTimestampedErrors.push([
             instance,
-            new TimestampedError(error.message, path, timestamp),
+            new TimestampedError(
+              error.message,
+              instance,
+              aasVerificationPathToArrayOfPrimitives(error.path),
+              timestamp
+            ),
           ]);
 
           if (
@@ -572,9 +534,8 @@ export class ContinuousVerification {
       // Remove the instances from the verification queue since we processed
       // them.
       function* overInstances() {
-        // noinspection JSUnusedLocalSymbols
-        for (const instanceTimestamp of instancesTimestamps) {
-          yield instanceTimestamp[0];
+        for (const timestampedInstance of timestampedInstances) {
+          yield timestampedInstance.instance;
         }
       }
 
@@ -694,6 +655,60 @@ function isArrayOfInstancesOrNull(
 }
 
 /**
+ * Update the `pathVersion` if there is a change to any of the relative paths
+ * from parent.
+ *
+ * @param instancePathsVersion to be updated
+ * @param pathInEnvironment to the changed value
+ */
+export function updatePathVersionOnStateChange(
+  instancePathsVersion: Versioning,
+  pathInEnvironment: ReadonlyArray<string | symbol>
+) {
+  let prevSegment = null;
+  for (const segment of pathInEnvironment) {
+    if (
+      prevSegment === "_aasCoreEditorEnhancement" &&
+      segment === "relativePathFromParent"
+    ) {
+      instancePathsVersion.version++;
+      return;
+    }
+    prevSegment = segment;
+  }
+}
+
+function followPathInEnvironment(
+  environment: Readonly<aas.types.Environment>,
+  pathInEnvironment: ReadonlyArray<string | symbol>
+): unknown {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let cursor: any = environment;
+
+  // We skip the last element as it refers to the property which has been
+  // changed.
+  for (let i = 0; i < pathInEnvironment.length; i++) {
+    if (typeof cursor !== "object") {
+      console.error(
+        `Expected objects as all references on the path, ` +
+          `but got a non-object for segment ${String(pathInEnvironment[i])}`,
+        cursor,
+        pathInEnvironment
+      );
+      throw new Error("Assertion violation");
+    }
+
+    if (cursor === null) {
+      console.error("Unexpected null cursor");
+      throw new Error("Assertion violation");
+    }
+
+    cursor = cursor[pathInEnvironment[i]];
+  }
+  return cursor;
+}
+
+/**
  * Propagate the change obtained from the subscription to the proxy to
  * the `verification`.
  *
@@ -720,6 +735,15 @@ export function updateVerificationOnStateChange(
     throw new Error("Assertion violation");
   }
 
+  // NOTE (mristin, 2023-02-10):
+  // We ignore the changes to the enhancements as we only verify the actual data
+  // of the model.
+  for (const segment of pathInEnvironment) {
+    if (segment === "_aasCoreEditorEnhancement") {
+      return;
+    }
+  }
+
   if (isPrimitiveOrNull(value) && isPrimitiveOrNull(previousValue)) {
     // NOTE (mristin, 2023-02-03):
     // Since the meta-model knows only instances and lists of class instances,
@@ -735,31 +759,13 @@ export function updateVerificationOnStateChange(
       throw new Error("Assertion violated");
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let cursor: any = environment;
-
     // We skip the last element as it refers to the property which has been
     // changed.
-    for (let i = 0; i < pathInEnvironment.length - 1; i++) {
-      if (typeof cursor !== "object") {
-        console.error(
-          `Expected objects as all references on the path, ` +
-            `but got a non-object for segment ${String(pathInEnvironment[i])}`,
-          cursor,
-          pathInEnvironment
-        );
-        throw new Error("Assertion violation");
-      }
+    const something = followPathInEnvironment(
+      environment,
+      pathInEnvironment.slice(0, -1)
+    );
 
-      if (cursor === null) {
-        console.error("Unexpected null cursor");
-        throw new Error("Assertion violation");
-      }
-
-      cursor = cursor[pathInEnvironment[i]];
-    }
-
-    const something: unknown = cursor;
     if (something === null || !isInstanceOrNull(something)) {
       console.error(
         "Expected an instance, but got something else following the path",
@@ -792,8 +798,18 @@ export function updateVerificationOnStateChange(
     isArrayOfInstancesOrNull(value) &&
     isArrayOfInstancesOrNull(previousValue)
   ) {
+    // NOTE (mristin, 2023-02-10):
+    // We have to take the proxy here. Otherwise, the instances which we would
+    // propagate for the verification wouldn't be proxies, but the actual
+    // objects. Changes to the proxies would thus not be reflected in those
+    // actual objects.
+    const arrayProxy = followPathInEnvironment(
+      environment,
+      pathInEnvironment
+    ) as unknown as Array<aas.types.Class> | null;
+
     const valueSet: Set<aas.types.Class> =
-      value === null ? new Set() : new Set(value);
+      arrayProxy === null ? new Set() : new Set(arrayProxy);
 
     const previousValueSet: Set<aas.types.Class> =
       previousValue === null ? new Set() : new Set(previousValue);
