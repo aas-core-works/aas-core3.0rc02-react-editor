@@ -1,5 +1,4 @@
 import * as aas from "@aas-core-works/aas-core3.0rc02-typescript";
-import * as valtio from "valtio";
 
 import * as debugconf from "./debugconf";
 import * as emptory from "./emptory.generated";
@@ -42,7 +41,7 @@ export function getRelativePathFromParent(
   return enhanced._aasCoreEditorEnhancement.relativePathFromParent;
 }
 
-function mutableRelativePathFromParent(
+export function mutableRelativePathFromParent(
   instance: aas.types.Class
 ): Array<string | number> {
   const enhanced = enhancing.mustAsEnhanced(instance);
@@ -167,58 +166,12 @@ export function removeFromContainer<ClassT extends aas.types.Class>(
     return null;
   }
 
-  // NOTE (mristin, 2023-02-10):
-  // This check is necessary here since it is a nightmare to debug
-  // valtio otherwise. If we ever get a non-proxy in the container,
-  // the relative paths will not properly trigger the downstream changes!
-  //
-  // See: https://github.com/pmndrs/valtio/discussions/473
-  for (const item of container) {
-    if (typeof valtio.getVersion(item) !== "number") {
-      console.error(
-        "Expected all the items of the container to be valtio proxies, " +
-          "but got something else.",
-        item.constructor.name,
-        item,
-        container
-      );
-      throw new Error("Assertion violation");
-    }
-  }
-
   const newContainer: Array<ClassT> | null = [];
 
-  let afterTheRemoved = false;
   for (let i = 0; i < container.length; i++) {
     const item = container[i];
     if (getOurId(item) === ourId) {
-      afterTheRemoved = true;
       continue;
-    }
-
-    if (afterTheRemoved) {
-      const mutableRelPath = mutableRelativePathFromParent(item);
-      if (mutableRelPath.length !== 2) {
-        console.error(
-          "Expected the relative path from parent to a container item " +
-            "to have exactly two segments (the property and the index), " +
-            "but got something else",
-          mutableRelPath
-        );
-        throw new Error("Assertion violation");
-      }
-
-      if (mutableRelPath[1] !== i) {
-        console.error(
-          "Expected the relative path from parent to a container item " +
-            `to have exactly the last segment ${i}, but got something else`,
-          mutableRelPath,
-          i
-        );
-        throw new Error("Assertion violation");
-      }
-
-      mutableRelPath[1]--;
     }
 
     newContainer.push(item);
@@ -233,9 +186,6 @@ export function removeFromContainer<ClassT extends aas.types.Class>(
 
 /**
  * Create a copy of the `container` with an item moved within it.
- *
- * @remarks
- * The relative paths from parent are updated in all the items.
  *
  * @param container to be iterated through
  * @param ourId enhanced ID of the item to be moved
@@ -255,25 +205,6 @@ export function moveInContainer<ClassT extends aas.types.Class>(
       container
     );
     throw new Error("Assertion violation");
-  }
-
-  // NOTE (mristin, 2023-02-10):
-  // This check is necessary here since it is a nightmare to debug
-  // valtio otherwise. If we ever get a non-proxy in the container,
-  // the relative paths will not properly trigger the downstream changes!
-  //
-  // See: https://github.com/pmndrs/valtio/discussions/473
-  for (const item of container) {
-    if (typeof valtio.getVersion(item) !== "number") {
-      console.error(
-        "Expected all the items of the container to be valtio proxies, " +
-          "but got something else.",
-        item.constructor.name,
-        item,
-        container
-      );
-      throw new Error("Assertion violation");
-    }
   }
 
   let sourceIndex = null;
@@ -296,44 +227,6 @@ export function moveInContainer<ClassT extends aas.types.Class>(
   const tmp = newContainer[targetIndex];
   newContainer[targetIndex] = newContainer[sourceIndex];
   newContainer[sourceIndex] = tmp;
-
-  if (debugconf.DEBUG_WITH_INVARIANTS) {
-    const containerSet = new Set(container);
-    const newContainerSet = new Set(newContainer);
-    if (containerSet.size !== container.length) {
-      console.error("Duplicate entries in the container", container);
-      throw new Error("Assertion violation");
-    }
-
-    if (newContainerSet.size !== newContainer.length) {
-      console.error("Duplicate entries in the new container", newContainer);
-      throw new Error("Assertion violation");
-    }
-
-    if (newContainer.length !== container.length) {
-      console.error(
-        "New container differs in length from container",
-        container.length,
-        newContainer.length
-      );
-    }
-  }
-
-  for (let i = 0; i < newContainer.length; i++) {
-    const mutableRelPath = mutableRelativePathFromParent(newContainer[i]);
-
-    if (mutableRelPath.length !== 2) {
-      console.error(
-        "Expected the relative path from parent to a container item " +
-          "to have exactly two segments (the property and the index), " +
-          "but got something else",
-        mutableRelPath
-      );
-      throw new Error("Assertion violation");
-    }
-
-    mutableRelPath[1] = i;
-  }
 
   return newContainer;
 }

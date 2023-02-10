@@ -654,30 +654,6 @@ function isArrayOfInstancesOrNull(
   return true;
 }
 
-/**
- * Update the `pathVersion` if there is a change to any of the relative paths
- * from parent.
- *
- * @param instancePathsVersion to be updated
- * @param pathInEnvironment to the changed value
- */
-export function updatePathVersionOnStateChange(
-  instancePathsVersion: Versioning,
-  pathInEnvironment: ReadonlyArray<string | symbol>
-) {
-  let prevSegment = null;
-  for (const segment of pathInEnvironment) {
-    if (
-      prevSegment === "_aasCoreEditorEnhancement" &&
-      segment === "relativePathFromParent"
-    ) {
-      instancePathsVersion.version++;
-      return;
-    }
-    prevSegment = segment;
-  }
-}
-
 function followPathInEnvironment(
   environment: Readonly<aas.types.Environment>,
   pathInEnvironment: ReadonlyArray<string | symbol>
@@ -706,6 +682,74 @@ function followPathInEnvironment(
     cursor = cursor[pathInEnvironment[i]];
   }
   return cursor;
+}
+
+/**
+ * Update the `pathVersion` if there is a change to any of the relative paths
+ * from parent.
+ *
+ * @param environment environment under change
+ * @param instancePathsVersioning to be updated
+ * @param pathInEnvironment to the changed value
+ * @param value new value after the change
+ * @param previousValue value before the change
+ */
+export function updateRelativePathsOnStateChange(
+  environment: Readonly<aas.types.Environment>,
+  pathInEnvironment: ReadonlyArray<string | symbol>,
+  value: unknown,
+  previousValue: unknown,
+  instancePathsVersioning: Versioning
+) {
+  // NOTE (mristin, 2023-02-10):
+  // We ignore the changes to the enhancements as they react, but do not effect
+  // the changes in the paths.
+  for (const segment of pathInEnvironment) {
+    if (segment === "_aasCoreEditorEnhancement") {
+      return;
+    }
+  }
+
+  if (
+    isArrayOfInstancesOrNull(value) &&
+    isArrayOfInstancesOrNull(previousValue)
+  ) {
+    // NOTE (mristin, 2023-02-10):
+    // We have to take the proxy here. Otherwise, the changes to the relative
+    // paths wouldn't be propagated.
+    const arrayProxy = followPathInEnvironment(
+      environment,
+      pathInEnvironment
+    ) as unknown as Array<aas.types.Class> | null;
+
+    let bumpVersion = false;
+
+    if (arrayProxy !== null) {
+      for (let i = 0; i < arrayProxy.length; i++) {
+        const mutablePathRelativeToParent = model.mutableRelativePathFromParent(
+          arrayProxy[i]
+        );
+
+        if (mutablePathRelativeToParent.length !== 2) {
+          console.error(
+            "Expected exactly two segments in an item of a container, " +
+              "but got something else",
+            mutablePathRelativeToParent
+          );
+          throw new Error("Assertion violation");
+        }
+
+        if (mutablePathRelativeToParent[1] !== i) {
+          mutablePathRelativeToParent[1] = i;
+          bumpVersion = true;
+        }
+      }
+    }
+
+    if (bumpVersion) {
+      instancePathsVersioning.version++;
+    }
+  }
 }
 
 /**

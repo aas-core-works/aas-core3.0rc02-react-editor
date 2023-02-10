@@ -82,9 +82,12 @@ function App(props: {
               props.verification
             );
 
-            verification.updatePathVersionOnStateChange(
-              props.verification.instancesPathVersioning,
-              pathInEnvironment
+            verification.updateRelativePathsOnStateChange(
+              props.state.environment,
+              pathInEnvironment,
+              value,
+              prevValue,
+              props.verification.instancesPathVersioning
             );
           }
         }
