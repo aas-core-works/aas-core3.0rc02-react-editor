@@ -14,12 +14,95 @@
 //
 
 import * as aas from "@aas-core-works/aas-core3.0rc02-typescript";
+import * as valtio from "valtio";
+
 import * as incrementalid from "./incrementalid";
+import * as model from "./model";
+
+/**
+ * Represent an error with a timestamp of the change.
+ */
+export class TimestampedError {
+  constructor(
+    public message: string,
+    public instance: aas.types.Class,
+    public relativePathFromInstance: Array<number | string>,
+    public timestamp: number,
+    public guid = incrementalid.next()
+  ) {}
+
+  pathAsString(): string {
+    const path = model.collectPath(this.instance);
+    path.push(...this.relativePathFromInstance);
+
+    if (path.length === 0) {
+      return "";
+    }
+
+    // NOTE (2023-02-10):
+    // See: https://stackoverflow.com/questions/16696632/most-efficient-way-to-concatenate-strings-in-javascript
+    // for string concatenation.
+    let result = "";
+
+    for (const segment of path) {
+      if (typeof segment === "string") {
+        result += `.${segment}`;
+      } else {
+        result += `[${segment}]`;
+      }
+    }
+
+    return result;
+  }
+}
+
+export class VersionedSet<T> {
+  private readonly content = new Set<T>();
+  private readonly versioning = valtio.proxy({ version: 0 });
+
+  *[Symbol.iterator]() {
+    yield* this.content;
+  }
+
+  add(item: T) {
+    let bumpVersion = false;
+    if (!this.content.has(item)) {
+      this.content.add(item);
+      bumpVersion = true;
+    }
+
+    if (bumpVersion) {
+      this.versioning.version++;
+    }
+  }
+
+  delete(item: T) {
+    const bumpVersion = this.content.delete(item);
+    if (bumpVersion) {
+      this.versioning.version++;
+    }
+  }
+
+  clear() {
+    if (this.content.size === 0) {
+      return;
+    }
+
+    this.content.clear();
+    this.versioning.version++;
+  }
+
+  public get size() {
+    return this.content.size;
+  }
+}
 
 class Enhancement {
   id: string;
   parent: aas.types.Class | null;
   relativePathFromParent: Array<number | string>;
+  errors = valtio.ref(new VersionedSet<TimestampedError>());
+  descendantsWithErrors = valtio.ref(new VersionedSet<aas.types.Class>());
 
   constructor(
     id: string,

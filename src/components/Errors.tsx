@@ -2,14 +2,13 @@ import * as aas from "@aas-core-works/aas-core3.0rc02-typescript";
 import * as React from "react";
 import * as valtio from "valtio";
 
+import * as enhancing from "../enhancing.generated";
 import * as hooks from "./hooks"
 import * as verification from '../verification'
 
 function sortErrors(
-  iterable: IterableIterator<verification.TimestampedError>
-): Array<verification.TimestampedError> {
-  const errors = Array.from(iterable);
-
+  errors: Array<enhancing.TimestampedError>
+): void {
   errors.sort(
     (that, other) => {
       const thatKey = that.pathAsString();
@@ -33,21 +32,18 @@ function sortErrors(
       }
     }
   );
-
-  return errors;
 }
 
 export function Errors(
   props: {
     verification: verification.Verification,
-    snapEnvironment: Readonly<aas.types.Environment>,
+    environment: Readonly<aas.types.Environment>,
   }
 ) {
-
   // We need to re-render whenever the state changes as the paths might
   // be different.
   const [timestampedErrors, setTimestampedErrors] =
-    React.useState<Array<verification.TimestampedError> | null>(
+    React.useState<Array<enhancing.TimestampedError> | null>(
       null
     )
 
@@ -60,18 +56,23 @@ export function Errors(
   );
 
   const debouncedPathVersion = hooks.useDebounce(
-    snapInstancesPathVersioning.version,
+    snapInstancesPathVersioning,
     200
   );
 
   const debouncedErrorVersion = hooks.useDebounce(
-    snapErrorVersioning.version,
+    snapErrorVersioning,
     200
   );
 
   React.useEffect(
     () => {
-      const errors = sortErrors(props.verification.errorMap.errors());
+      const errors = Array.from(
+        props.verification.errorMap.collect(props.environment)
+      );
+
+      sortErrors(errors);
+
       if (errors.length === 0) {
         setTimestampedErrors(null);
       } else {
