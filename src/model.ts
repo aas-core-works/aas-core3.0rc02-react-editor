@@ -1,6 +1,5 @@
 import * as aas from "@aas-core-works/aas-core3.0rc02-typescript";
 
-import * as debugconf from "./debugconf";
 import * as emptory from "./emptory.generated";
 import * as enhancing from "./enhancing.generated";
 
