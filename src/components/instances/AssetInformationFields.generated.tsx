@@ -11,10 +11,15 @@
 
 import * as aas from "@aas-core-works/aas-core3.0rc02-typescript";
 import * as React from "react";
+import * as valtio from "valtio";
 
-import * as fields from '../fields';
-import * as help from './help.generated';
-import * as newinstancing from '../../newinstancing.generated';
+import * as enhancing from "../../enhancing.generated";
+import * as fields from "../fields";
+import * as help from "./help.generated";
+import * as model from "../../model";
+import * as newinstancing from "../../newinstancing.generated";
+import * as verification from "../../verification";
+import * as widgets from "../widgets";
 
 export function AssetInformationFields(
   props: {
@@ -22,8 +27,43 @@ export function AssetInformationFields(
     instance: aas.types.AssetInformation,
   }
 ) {
+  const [instanceErrors, setInstanceErrors] = React.useState<
+    Array<enhancing.TimestampedError> | null>(null);
+
+  const [errorsForAssetKind, setErrorsForAssetKind] = React.useState<
+    Array<enhancing.TimestampedError> | null>(null);
+
+  const snapErrorSetVersioning = valtio.useSnapshot(
+    model.getErrorSet(props.instance).versioning
+  );
+
+  React.useEffect(
+    () => {
+      const [
+        anotherInstanceErrors,
+        errorsByProperty
+      ] = verification.categorizeInstanceErrors(
+        model.getErrorSet(props.instance)
+      );
+
+      setInstanceErrors(anotherInstanceErrors);
+
+      const anotherErrorsForAssetKind =
+        errorsByProperty.get("assetKind");
+      setErrorsForAssetKind(
+        anotherErrorsForAssetKind === undefined
+          ? null
+          : anotherErrorsForAssetKind
+      );
+    },
+    [
+      snapErrorSetVersioning,
+      props.instance
+    ]
+  );
   return (
     <>
+    <widgets.LocalErrors errors={instanceErrors} />
       <fields.EnumerationFieldRequired
         label="Asset kind"
         helpUrl={
@@ -37,6 +77,7 @@ export function AssetInformationFields(
             props.instance.assetKind = value;
           }
         }
+        errors={errorsForAssetKind}
       />
 
       <fields.EmbeddedInstanceOptional<aas.types.Reference>

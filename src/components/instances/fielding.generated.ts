@@ -69,7 +69,7 @@ class FieldDispatcher extends aas.types.AbstractTransformerWithContext<
   ): React.ReactElement {
     assertTypesMatch(that, snap);
 
-    return ExtensionFields({
+    return React.createElement(ExtensionFields, {
       snapInstance: snap,
       instance: that,
     });
@@ -81,7 +81,7 @@ class FieldDispatcher extends aas.types.AbstractTransformerWithContext<
   ): React.ReactElement {
     assertTypesMatch(that, snap);
 
-    return AdministrativeInformationFields({
+    return React.createElement(AdministrativeInformationFields, {
       snapInstance: snap,
       instance: that,
     });
@@ -93,7 +93,7 @@ class FieldDispatcher extends aas.types.AbstractTransformerWithContext<
   ): React.ReactElement {
     assertTypesMatch(that, snap);
 
-    return QualifierFields({
+    return React.createElement(QualifierFields, {
       snapInstance: snap,
       instance: that,
     });
@@ -105,7 +105,7 @@ class FieldDispatcher extends aas.types.AbstractTransformerWithContext<
   ): React.ReactElement {
     assertTypesMatch(that, snap);
 
-    return AssetAdministrationShellFields({
+    return React.createElement(AssetAdministrationShellFields, {
       snapInstance: snap,
       instance: that,
     });
@@ -117,7 +117,7 @@ class FieldDispatcher extends aas.types.AbstractTransformerWithContext<
   ): React.ReactElement {
     assertTypesMatch(that, snap);
 
-    return AssetInformationFields({
+    return React.createElement(AssetInformationFields, {
       snapInstance: snap,
       instance: that,
     });
@@ -129,7 +129,7 @@ class FieldDispatcher extends aas.types.AbstractTransformerWithContext<
   ): React.ReactElement {
     assertTypesMatch(that, snap);
 
-    return ResourceFields({
+    return React.createElement(ResourceFields, {
       snapInstance: snap,
       instance: that,
     });
@@ -141,7 +141,7 @@ class FieldDispatcher extends aas.types.AbstractTransformerWithContext<
   ): React.ReactElement {
     assertTypesMatch(that, snap);
 
-    return SpecificAssetIdFields({
+    return React.createElement(SpecificAssetIdFields, {
       snapInstance: snap,
       instance: that,
     });
@@ -153,7 +153,7 @@ class FieldDispatcher extends aas.types.AbstractTransformerWithContext<
   ): React.ReactElement {
     assertTypesMatch(that, snap);
 
-    return SubmodelFields({
+    return React.createElement(SubmodelFields, {
       snapInstance: snap,
       instance: that,
     });
@@ -165,7 +165,7 @@ class FieldDispatcher extends aas.types.AbstractTransformerWithContext<
   ): React.ReactElement {
     assertTypesMatch(that, snap);
 
-    return RelationshipElementFields({
+    return React.createElement(RelationshipElementFields, {
       snapInstance: snap,
       instance: that,
     });
@@ -177,7 +177,7 @@ class FieldDispatcher extends aas.types.AbstractTransformerWithContext<
   ): React.ReactElement {
     assertTypesMatch(that, snap);
 
-    return SubmodelElementListFields({
+    return React.createElement(SubmodelElementListFields, {
       snapInstance: snap,
       instance: that,
     });
@@ -189,7 +189,7 @@ class FieldDispatcher extends aas.types.AbstractTransformerWithContext<
   ): React.ReactElement {
     assertTypesMatch(that, snap);
 
-    return SubmodelElementCollectionFields({
+    return React.createElement(SubmodelElementCollectionFields, {
       snapInstance: snap,
       instance: that,
     });
@@ -201,7 +201,7 @@ class FieldDispatcher extends aas.types.AbstractTransformerWithContext<
   ): React.ReactElement {
     assertTypesMatch(that, snap);
 
-    return PropertyFields({
+    return React.createElement(PropertyFields, {
       snapInstance: snap,
       instance: that,
     });
@@ -213,7 +213,7 @@ class FieldDispatcher extends aas.types.AbstractTransformerWithContext<
   ): React.ReactElement {
     assertTypesMatch(that, snap);
 
-    return MultiLanguagePropertyFields({
+    return React.createElement(MultiLanguagePropertyFields, {
       snapInstance: snap,
       instance: that,
     });
@@ -225,7 +225,7 @@ class FieldDispatcher extends aas.types.AbstractTransformerWithContext<
   ): React.ReactElement {
     assertTypesMatch(that, snap);
 
-    return RangeFields({
+    return React.createElement(RangeFields, {
       snapInstance: snap,
       instance: that,
     });
@@ -237,7 +237,7 @@ class FieldDispatcher extends aas.types.AbstractTransformerWithContext<
   ): React.ReactElement {
     assertTypesMatch(that, snap);
 
-    return ReferenceElementFields({
+    return React.createElement(ReferenceElementFields, {
       snapInstance: snap,
       instance: that,
     });
@@ -249,7 +249,7 @@ class FieldDispatcher extends aas.types.AbstractTransformerWithContext<
   ): React.ReactElement {
     assertTypesMatch(that, snap);
 
-    return BlobFields({
+    return React.createElement(BlobFields, {
       snapInstance: snap,
       instance: that,
     });
@@ -261,7 +261,7 @@ class FieldDispatcher extends aas.types.AbstractTransformerWithContext<
   ): React.ReactElement {
     assertTypesMatch(that, snap);
 
-    return FileFields({
+    return React.createElement(FileFields, {
       snapInstance: snap,
       instance: that,
     });
@@ -273,7 +273,7 @@ class FieldDispatcher extends aas.types.AbstractTransformerWithContext<
   ): React.ReactElement {
     assertTypesMatch(that, snap);
 
-    return AnnotatedRelationshipElementFields({
+    return React.createElement(AnnotatedRelationshipElementFields, {
       snapInstance: snap,
       instance: that,
     });
@@ -285,7 +285,7 @@ class FieldDispatcher extends aas.types.AbstractTransformerWithContext<
   ): React.ReactElement {
     assertTypesMatch(that, snap);
 
-    return EntityFields({
+    return React.createElement(EntityFields, {
       snapInstance: snap,
       instance: that,
     });
@@ -297,7 +297,7 @@ class FieldDispatcher extends aas.types.AbstractTransformerWithContext<
   ): React.ReactElement {
     assertTypesMatch(that, snap);
 
-    return EventPayloadFields({
+    return React.createElement(EventPayloadFields, {
       snapInstance: snap,
       instance: that,
     });
@@ -309,7 +309,7 @@ class FieldDispatcher extends aas.types.AbstractTransformerWithContext<
   ): React.ReactElement {
     assertTypesMatch(that, snap);
 
-    return BasicEventElementFields({
+    return React.createElement(BasicEventElementFields, {
       snapInstance: snap,
       instance: that,
     });
@@ -321,7 +321,7 @@ class FieldDispatcher extends aas.types.AbstractTransformerWithContext<
   ): React.ReactElement {
     assertTypesMatch(that, snap);
 
-    return OperationFields({
+    return React.createElement(OperationFields, {
       snapInstance: snap,
       instance: that,
     });
@@ -333,7 +333,7 @@ class FieldDispatcher extends aas.types.AbstractTransformerWithContext<
   ): React.ReactElement {
     assertTypesMatch(that, snap);
 
-    return OperationVariableFields({
+    return React.createElement(OperationVariableFields, {
       snapInstance: snap,
       instance: that,
     });
@@ -345,7 +345,7 @@ class FieldDispatcher extends aas.types.AbstractTransformerWithContext<
   ): React.ReactElement {
     assertTypesMatch(that, snap);
 
-    return CapabilityFields({
+    return React.createElement(CapabilityFields, {
       snapInstance: snap,
       instance: that,
     });
@@ -357,7 +357,7 @@ class FieldDispatcher extends aas.types.AbstractTransformerWithContext<
   ): React.ReactElement {
     assertTypesMatch(that, snap);
 
-    return ConceptDescriptionFields({
+    return React.createElement(ConceptDescriptionFields, {
       snapInstance: snap,
       instance: that,
     });
@@ -369,7 +369,7 @@ class FieldDispatcher extends aas.types.AbstractTransformerWithContext<
   ): React.ReactElement {
     assertTypesMatch(that, snap);
 
-    return ReferenceFields({
+    return React.createElement(ReferenceFields, {
       snapInstance: snap,
       instance: that,
     });
@@ -381,7 +381,7 @@ class FieldDispatcher extends aas.types.AbstractTransformerWithContext<
   ): React.ReactElement {
     assertTypesMatch(that, snap);
 
-    return KeyFields({
+    return React.createElement(KeyFields, {
       snapInstance: snap,
       instance: that,
     });
@@ -393,7 +393,7 @@ class FieldDispatcher extends aas.types.AbstractTransformerWithContext<
   ): React.ReactElement {
     assertTypesMatch(that, snap);
 
-    return LangStringFields({
+    return React.createElement(LangStringFields, {
       snapInstance: snap,
       instance: that,
     });
@@ -405,7 +405,7 @@ class FieldDispatcher extends aas.types.AbstractTransformerWithContext<
   ): React.ReactElement {
     assertTypesMatch(that, snap);
 
-    return EnvironmentFields({
+    return React.createElement(EnvironmentFields, {
       snapInstance: snap,
       instance: that,
     });
@@ -417,7 +417,7 @@ class FieldDispatcher extends aas.types.AbstractTransformerWithContext<
   ): React.ReactElement {
     assertTypesMatch(that, snap);
 
-    return EmbeddedDataSpecificationFields({
+    return React.createElement(EmbeddedDataSpecificationFields, {
       snapInstance: snap,
       instance: that,
     });
@@ -429,7 +429,7 @@ class FieldDispatcher extends aas.types.AbstractTransformerWithContext<
   ): React.ReactElement {
     assertTypesMatch(that, snap);
 
-    return ValueReferencePairFields({
+    return React.createElement(ValueReferencePairFields, {
       snapInstance: snap,
       instance: that,
     });
@@ -441,7 +441,7 @@ class FieldDispatcher extends aas.types.AbstractTransformerWithContext<
   ): React.ReactElement {
     assertTypesMatch(that, snap);
 
-    return ValueListFields({
+    return React.createElement(ValueListFields, {
       snapInstance: snap,
       instance: that,
     });
@@ -453,7 +453,7 @@ class FieldDispatcher extends aas.types.AbstractTransformerWithContext<
   ): React.ReactElement {
     assertTypesMatch(that, snap);
 
-    return DataSpecificationIec61360Fields({
+    return React.createElement(DataSpecificationIec61360Fields, {
       snapInstance: snap,
       instance: that,
     });
@@ -465,7 +465,7 @@ class FieldDispatcher extends aas.types.AbstractTransformerWithContext<
   ): React.ReactElement {
     assertTypesMatch(that, snap);
 
-    return DataSpecificationPhysicalUnitFields({
+    return React.createElement(DataSpecificationPhysicalUnitFields, {
       snapInstance: snap,
       instance: that,
     });

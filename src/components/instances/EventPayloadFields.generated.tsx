@@ -11,10 +11,15 @@
 
 import * as aas from "@aas-core-works/aas-core3.0rc02-typescript";
 import * as React from "react";
+import * as valtio from "valtio";
 
-import * as fields from '../fields';
-import * as help from './help.generated';
-import * as newinstancing from '../../newinstancing.generated';
+import * as enhancing from "../../enhancing.generated";
+import * as fields from "../fields";
+import * as help from "./help.generated";
+import * as model from "../../model";
+import * as newinstancing from "../../newinstancing.generated";
+import * as verification from "../../verification";
+import * as widgets from "../widgets";
 
 export function EventPayloadFields(
   props: {
@@ -22,8 +27,65 @@ export function EventPayloadFields(
     instance: aas.types.EventPayload,
   }
 ) {
+  const [instanceErrors, setInstanceErrors] = React.useState<
+    Array<enhancing.TimestampedError> | null>(null);
+
+  const [errorsForTopic, setErrorsForTopic] = React.useState<
+    Array<enhancing.TimestampedError> | null>(null);
+
+  const [errorsForTimeStamp, setErrorsForTimeStamp] = React.useState<
+    Array<enhancing.TimestampedError> | null>(null);
+
+  const [errorsForPayload, setErrorsForPayload] = React.useState<
+    Array<enhancing.TimestampedError> | null>(null);
+
+  const snapErrorSetVersioning = valtio.useSnapshot(
+    model.getErrorSet(props.instance).versioning
+  );
+
+  React.useEffect(
+    () => {
+      const [
+        anotherInstanceErrors,
+        errorsByProperty
+      ] = verification.categorizeInstanceErrors(
+        model.getErrorSet(props.instance)
+      );
+
+      setInstanceErrors(anotherInstanceErrors);
+
+      const anotherErrorsForTopic =
+        errorsByProperty.get("topic");
+      setErrorsForTopic(
+        anotherErrorsForTopic === undefined
+          ? null
+          : anotherErrorsForTopic
+      );
+
+      const anotherErrorsForTimeStamp =
+        errorsByProperty.get("timeStamp");
+      setErrorsForTimeStamp(
+        anotherErrorsForTimeStamp === undefined
+          ? null
+          : anotherErrorsForTimeStamp
+      );
+
+      const anotherErrorsForPayload =
+        errorsByProperty.get("payload");
+      setErrorsForPayload(
+        anotherErrorsForPayload === undefined
+          ? null
+          : anotherErrorsForPayload
+      );
+    },
+    [
+      snapErrorSetVersioning,
+      props.instance
+    ]
+  );
   return (
     <>
+    <widgets.LocalErrors errors={instanceErrors} />
       <fields.EmbeddedInstanceRequired<aas.types.Reference>
         label="Source"
         helpUrl={
@@ -127,6 +189,7 @@ export function EventPayloadFields(
             props.instance.topic = value;
           }
         }
+        errors={errorsForTopic}
       />
 
       <fields.EmbeddedInstanceOptional<aas.types.Reference>
@@ -163,6 +226,7 @@ export function EventPayloadFields(
             props.instance.timeStamp = value;
           }
         }
+        errors={errorsForTimeStamp}
       />
 
       <fields.TextFieldOptional
@@ -176,6 +240,7 @@ export function EventPayloadFields(
             props.instance.payload = value;
           }
         }
+        errors={errorsForPayload}
       />
     </>
   )

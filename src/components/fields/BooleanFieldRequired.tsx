@@ -1,35 +1,28 @@
 import * as React from "react";
 
-import * as incrementalid from "../../incrementalid";
+import * as enhancing from "../../enhancing.generated";
 
-import {HelpLink} from "./HelpLink";
+import {NonCompositeField} from "./NonCompositeField";
 
 export function BooleanFieldRequired(
   props: {
     label: string,
     helpUrl: string | null,
     value: boolean,
-    onChange: (value: boolean) => void
+    onChange: (value: boolean) => void,
+    errors: Array<enhancing.TimestampedError> | null
   }
 ) {
-  const inputId = React.useState(incrementalid.next())[0];
-
   return (
-    <li>
-      <div className="aas-field">
-        <span className="aas-label">
-          {props.label}<HelpLink helpUrl={props.helpUrl}/>:
-        </span>
-
-        <input type="checkbox" id={inputId}
-               checked={props.value}
-               onChange={
-                 (event) => {
-                   props.onChange(event.target.checked)
-                 }
+    <NonCompositeField label={props.label} helpUrl={props.helpUrl} errors={props.errors}>
+      <input type="checkbox"
+             checked={props.value}
+             onChange={
+               (event) => {
+                 props.onChange(event.target.checked)
                }
-        />
-      </div>
-    </li>
+             }
+      />
+    </NonCompositeField>
   )
 }

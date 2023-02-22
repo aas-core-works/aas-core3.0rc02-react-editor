@@ -11,10 +11,15 @@
 
 import * as aas from "@aas-core-works/aas-core3.0rc02-typescript";
 import * as React from "react";
+import * as valtio from "valtio";
 
-import * as fields from '../fields';
-import * as help from './help.generated';
-import * as newinstancing from '../../newinstancing.generated';
+import * as enhancing from "../../enhancing.generated";
+import * as fields from "../fields";
+import * as help from "./help.generated";
+import * as model from "../../model";
+import * as newinstancing from "../../newinstancing.generated";
+import * as verification from "../../verification";
+import * as widgets from "../widgets";
 
 export function DataSpecificationPhysicalUnitFields(
   props: {
@@ -22,8 +27,164 @@ export function DataSpecificationPhysicalUnitFields(
     instance: aas.types.DataSpecificationPhysicalUnit,
   }
 ) {
+  const [instanceErrors, setInstanceErrors] = React.useState<
+    Array<enhancing.TimestampedError> | null>(null);
+
+  const [errorsForUnitName, setErrorsForUnitName] = React.useState<
+    Array<enhancing.TimestampedError> | null>(null);
+
+  const [errorsForUnitSymbol, setErrorsForUnitSymbol] = React.useState<
+    Array<enhancing.TimestampedError> | null>(null);
+
+  const [errorsForSiNotation, setErrorsForSiNotation] = React.useState<
+    Array<enhancing.TimestampedError> | null>(null);
+
+  const [errorsForSiName, setErrorsForSiName] = React.useState<
+    Array<enhancing.TimestampedError> | null>(null);
+
+  const [errorsForDinNotation, setErrorsForDinNotation] = React.useState<
+    Array<enhancing.TimestampedError> | null>(null);
+
+  const [errorsForEceName, setErrorsForEceName] = React.useState<
+    Array<enhancing.TimestampedError> | null>(null);
+
+  const [errorsForEceCode, setErrorsForEceCode] = React.useState<
+    Array<enhancing.TimestampedError> | null>(null);
+
+  const [errorsForNistName, setErrorsForNistName] = React.useState<
+    Array<enhancing.TimestampedError> | null>(null);
+
+  const [errorsForSourceOfDefinition, setErrorsForSourceOfDefinition] = React.useState<
+    Array<enhancing.TimestampedError> | null>(null);
+
+  const [errorsForConversionFactor, setErrorsForConversionFactor] = React.useState<
+    Array<enhancing.TimestampedError> | null>(null);
+
+  const [errorsForRegistrationAuthorityId, setErrorsForRegistrationAuthorityId] = React.useState<
+    Array<enhancing.TimestampedError> | null>(null);
+
+  const [errorsForSupplier, setErrorsForSupplier] = React.useState<
+    Array<enhancing.TimestampedError> | null>(null);
+
+  const snapErrorSetVersioning = valtio.useSnapshot(
+    model.getErrorSet(props.instance).versioning
+  );
+
+  React.useEffect(
+    () => {
+      const [
+        anotherInstanceErrors,
+        errorsByProperty
+      ] = verification.categorizeInstanceErrors(
+        model.getErrorSet(props.instance)
+      );
+
+      setInstanceErrors(anotherInstanceErrors);
+
+      const anotherErrorsForUnitName =
+        errorsByProperty.get("unitName");
+      setErrorsForUnitName(
+        anotherErrorsForUnitName === undefined
+          ? null
+          : anotherErrorsForUnitName
+      );
+
+      const anotherErrorsForUnitSymbol =
+        errorsByProperty.get("unitSymbol");
+      setErrorsForUnitSymbol(
+        anotherErrorsForUnitSymbol === undefined
+          ? null
+          : anotherErrorsForUnitSymbol
+      );
+
+      const anotherErrorsForSiNotation =
+        errorsByProperty.get("siNotation");
+      setErrorsForSiNotation(
+        anotherErrorsForSiNotation === undefined
+          ? null
+          : anotherErrorsForSiNotation
+      );
+
+      const anotherErrorsForSiName =
+        errorsByProperty.get("siName");
+      setErrorsForSiName(
+        anotherErrorsForSiName === undefined
+          ? null
+          : anotherErrorsForSiName
+      );
+
+      const anotherErrorsForDinNotation =
+        errorsByProperty.get("dinNotation");
+      setErrorsForDinNotation(
+        anotherErrorsForDinNotation === undefined
+          ? null
+          : anotherErrorsForDinNotation
+      );
+
+      const anotherErrorsForEceName =
+        errorsByProperty.get("eceName");
+      setErrorsForEceName(
+        anotherErrorsForEceName === undefined
+          ? null
+          : anotherErrorsForEceName
+      );
+
+      const anotherErrorsForEceCode =
+        errorsByProperty.get("eceCode");
+      setErrorsForEceCode(
+        anotherErrorsForEceCode === undefined
+          ? null
+          : anotherErrorsForEceCode
+      );
+
+      const anotherErrorsForNistName =
+        errorsByProperty.get("nistName");
+      setErrorsForNistName(
+        anotherErrorsForNistName === undefined
+          ? null
+          : anotherErrorsForNistName
+      );
+
+      const anotherErrorsForSourceOfDefinition =
+        errorsByProperty.get("sourceOfDefinition");
+      setErrorsForSourceOfDefinition(
+        anotherErrorsForSourceOfDefinition === undefined
+          ? null
+          : anotherErrorsForSourceOfDefinition
+      );
+
+      const anotherErrorsForConversionFactor =
+        errorsByProperty.get("conversionFactor");
+      setErrorsForConversionFactor(
+        anotherErrorsForConversionFactor === undefined
+          ? null
+          : anotherErrorsForConversionFactor
+      );
+
+      const anotherErrorsForRegistrationAuthorityId =
+        errorsByProperty.get("registrationAuthorityId");
+      setErrorsForRegistrationAuthorityId(
+        anotherErrorsForRegistrationAuthorityId === undefined
+          ? null
+          : anotherErrorsForRegistrationAuthorityId
+      );
+
+      const anotherErrorsForSupplier =
+        errorsByProperty.get("supplier");
+      setErrorsForSupplier(
+        anotherErrorsForSupplier === undefined
+          ? null
+          : anotherErrorsForSupplier
+      );
+    },
+    [
+      snapErrorSetVersioning,
+      props.instance
+    ]
+  );
   return (
     <>
+    <widgets.LocalErrors errors={instanceErrors} />
       <fields.TextFieldRequired
         label="Unit name"
         helpUrl={
@@ -35,6 +196,7 @@ export function DataSpecificationPhysicalUnitFields(
             props.instance.unitName = value;
           }
         }
+        errors={errorsForUnitName}
       />
 
       <fields.TextFieldRequired
@@ -48,6 +210,7 @@ export function DataSpecificationPhysicalUnitFields(
             props.instance.unitSymbol = value;
           }
         }
+        errors={errorsForUnitSymbol}
       />
 
       <fields.ListFieldRequired<aas.types.LangString>
@@ -84,6 +247,7 @@ export function DataSpecificationPhysicalUnitFields(
             props.instance.siNotation = value;
           }
         }
+        errors={errorsForSiNotation}
       />
 
       <fields.TextFieldOptional
@@ -97,6 +261,7 @@ export function DataSpecificationPhysicalUnitFields(
             props.instance.siName = value;
           }
         }
+        errors={errorsForSiName}
       />
 
       <fields.TextFieldOptional
@@ -110,6 +275,7 @@ export function DataSpecificationPhysicalUnitFields(
             props.instance.dinNotation = value;
           }
         }
+        errors={errorsForDinNotation}
       />
 
       <fields.TextFieldOptional
@@ -123,6 +289,7 @@ export function DataSpecificationPhysicalUnitFields(
             props.instance.eceName = value;
           }
         }
+        errors={errorsForEceName}
       />
 
       <fields.TextFieldOptional
@@ -136,6 +303,7 @@ export function DataSpecificationPhysicalUnitFields(
             props.instance.eceCode = value;
           }
         }
+        errors={errorsForEceCode}
       />
 
       <fields.TextFieldOptional
@@ -149,6 +317,7 @@ export function DataSpecificationPhysicalUnitFields(
             props.instance.nistName = value;
           }
         }
+        errors={errorsForNistName}
       />
 
       <fields.TextFieldOptional
@@ -162,6 +331,7 @@ export function DataSpecificationPhysicalUnitFields(
             props.instance.sourceOfDefinition = value;
           }
         }
+        errors={errorsForSourceOfDefinition}
       />
 
       <fields.TextFieldOptional
@@ -175,6 +345,7 @@ export function DataSpecificationPhysicalUnitFields(
             props.instance.conversionFactor = value;
           }
         }
+        errors={errorsForConversionFactor}
       />
 
       <fields.TextFieldOptional
@@ -188,6 +359,7 @@ export function DataSpecificationPhysicalUnitFields(
             props.instance.registrationAuthorityId = value;
           }
         }
+        errors={errorsForRegistrationAuthorityId}
       />
 
       <fields.TextFieldOptional
@@ -201,6 +373,7 @@ export function DataSpecificationPhysicalUnitFields(
             props.instance.supplier = value;
           }
         }
+        errors={errorsForSupplier}
       />
     </>
   )

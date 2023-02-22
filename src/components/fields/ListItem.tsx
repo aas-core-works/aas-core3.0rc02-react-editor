@@ -1,6 +1,9 @@
 import * as aas from "@aas-core-works/aas-core3.0rc02-typescript";
 import * as React from 'react';
+import * as valtio from 'valtio';
 
+import * as enhancing from '../../enhancing.generated'
+import * as model from '../../model'
 import * as titling from '../../titling.generated'
 import * as fielding from '../instances/fielding.generated'
 
@@ -13,10 +16,36 @@ export function ListItem<ClassT extends aas.types.Class>(
     shiftRight: (() => void) | null
   }
 ) {
+  const errorSetVersioning = valtio.useSnapshot(
+    model.getErrorSet(props.instance).versioning
+  );
+
+  const descendantsWithErrorsVersioning = valtio.useSnapshot(
+    model.getDescendantsWithErrors(props.instance).versioning
+  );
+
+  const [hasErrors, setHasErrors] = React.useState(false);
+
+  React.useEffect(
+    () => {
+      setHasErrors(
+        model.getErrorSet(props.instance).size > 0
+        || model.getDescendantsWithErrors(props.instance).size > 0
+      );
+    },
+    [
+      errorSetVersioning.version,
+      descendantsWithErrorsVersioning.version,
+      props.instance
+    ]
+  )
+
   return (
     <li className="aas-instance">
       <details open>
-        <summary>
+        <summary
+          className={hasErrors ? "aas-list-item-with-errors" : ""}
+        >
           {titling.getTitle(props.snapInstance)}
 
           <button

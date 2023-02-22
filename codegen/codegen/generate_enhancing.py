@@ -17,6 +17,7 @@ from aas_core_codegen.typescript.common import (
     INDENT as I,
     INDENT2 as II,
     INDENT3 as III,
+    INDENT4 as IIII
 )
 
 import codegen.common
@@ -209,48 +210,73 @@ export class TimestampedError {{
 
 {II}return result;
 {I}}}
+
+{I}relativePathFromInstanceAsString(): string {{
+{II}if (this.relativePathFromInstance.length === 0) {{
+{III}return "";
+{II}}}
+
+{II}// NOTE (2023-02-10):
+{II}// See: https://stackoverflow.com/questions/16696632/most-efficient-way-to-concatenate-strings-in-javascript
+{II}// for string concatenation.
+{II}let result = "";
+
+{II}for (const segment of this.relativePathFromInstance) {{
+{III}if (typeof segment === "string") {{
+{IIII}result += `.${{segment}}`;
+{III}}} else {{
+{IIII}result += `[${{segment}}]`;
+{III}}}
+{II}}}
+
+{II}return result;
+{I}}}
 }}"""
         ),
         Stripped(
             f"""\
 export class VersionedSet<T> {{
-{I}private readonly content = new Set<T>();
-{I}private readonly versioning = valtio.proxy({{ version: 0 }});
+{I}private readonly _content = new Set<T>();
+{I}private readonly _versioning = valtio.proxy({{ version: 0 }});
 
 {I}*[Symbol.iterator]() {{
-{II}yield* this.content;
+{II}yield* this._content;
 {I}}}
 
 {I}add(item: T) {{
 {II}let bumpVersion = false;
-{II}if (!this.content.has(item)) {{
-{III}this.content.add(item);
+{II}if (!this._content.has(item)) {{
+{III}this._content.add(item);
 {III}bumpVersion = true;
 {II}}}
 
 {II}if (bumpVersion) {{
-{III}this.versioning.version++;
+{III}this._versioning.version++;
 {II}}}
 {I}}}
 {I}
 {I}delete(item: T) {{
-{II}const bumpVersion = this.content.delete(item);
+{II}const bumpVersion = this._content.delete(item);
 {II}if (bumpVersion) {{
-{III}this.versioning.version++;
+{III}this._versioning.version++;
 {II}}}
 {I}}}
 {I}
 {I}clear() {{
-{II}if (this.content.size === 0) {{
+{II}if (this._content.size === 0) {{
 {III}return;
 {II}}}
 
-{II}this.content.clear();
-{II}this.versioning.version++;
+{II}this._content.clear();
+{II}this._versioning.version++;
 {I}}}
 
 {I}public get size() {{
-{II}return this.content.size;
+{II}return this._content.size;
+{I}}}
+
+{I}public get versioning() {{
+{II}return this._versioning;
 {I}}}
 }}"""
         ),

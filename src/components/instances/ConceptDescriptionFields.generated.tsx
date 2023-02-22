@@ -11,10 +11,15 @@
 
 import * as aas from "@aas-core-works/aas-core3.0rc02-typescript";
 import * as React from "react";
+import * as valtio from "valtio";
 
-import * as fields from '../fields';
-import * as help from './help.generated';
-import * as newinstancing from '../../newinstancing.generated';
+import * as enhancing from "../../enhancing.generated";
+import * as fields from "../fields";
+import * as help from "./help.generated";
+import * as model from "../../model";
+import * as newinstancing from "../../newinstancing.generated";
+import * as verification from "../../verification";
+import * as widgets from "../widgets";
 
 export function ConceptDescriptionFields(
   props: {
@@ -22,8 +27,76 @@ export function ConceptDescriptionFields(
     instance: aas.types.ConceptDescription,
   }
 ) {
+  const [instanceErrors, setInstanceErrors] = React.useState<
+    Array<enhancing.TimestampedError> | null>(null);
+
+  const [errorsForCategory, setErrorsForCategory] = React.useState<
+    Array<enhancing.TimestampedError> | null>(null);
+
+  const [errorsForIdShort, setErrorsForIdShort] = React.useState<
+    Array<enhancing.TimestampedError> | null>(null);
+
+  const [errorsForChecksum, setErrorsForChecksum] = React.useState<
+    Array<enhancing.TimestampedError> | null>(null);
+
+  const [errorsForId, setErrorsForId] = React.useState<
+    Array<enhancing.TimestampedError> | null>(null);
+
+  const snapErrorSetVersioning = valtio.useSnapshot(
+    model.getErrorSet(props.instance).versioning
+  );
+
+  React.useEffect(
+    () => {
+      const [
+        anotherInstanceErrors,
+        errorsByProperty
+      ] = verification.categorizeInstanceErrors(
+        model.getErrorSet(props.instance)
+      );
+
+      setInstanceErrors(anotherInstanceErrors);
+
+      const anotherErrorsForCategory =
+        errorsByProperty.get("category");
+      setErrorsForCategory(
+        anotherErrorsForCategory === undefined
+          ? null
+          : anotherErrorsForCategory
+      );
+
+      const anotherErrorsForIdShort =
+        errorsByProperty.get("idShort");
+      setErrorsForIdShort(
+        anotherErrorsForIdShort === undefined
+          ? null
+          : anotherErrorsForIdShort
+      );
+
+      const anotherErrorsForChecksum =
+        errorsByProperty.get("checksum");
+      setErrorsForChecksum(
+        anotherErrorsForChecksum === undefined
+          ? null
+          : anotherErrorsForChecksum
+      );
+
+      const anotherErrorsForId =
+        errorsByProperty.get("id");
+      setErrorsForId(
+        anotherErrorsForId === undefined
+          ? null
+          : anotherErrorsForId
+      );
+    },
+    [
+      snapErrorSetVersioning,
+      props.instance
+    ]
+  );
   return (
     <>
+    <widgets.LocalErrors errors={instanceErrors} />
       <fields.ListFieldOptional<aas.types.Extension>
         label="Extensions"
         helpUrl={
@@ -58,6 +131,7 @@ export function ConceptDescriptionFields(
             props.instance.category = value;
           }
         }
+        errors={errorsForCategory}
       />
 
       <fields.TextFieldOptional
@@ -71,6 +145,7 @@ export function ConceptDescriptionFields(
             props.instance.idShort = value;
           }
         }
+        errors={errorsForIdShort}
       />
 
       <fields.ListFieldOptional<aas.types.LangString>
@@ -130,6 +205,7 @@ export function ConceptDescriptionFields(
             props.instance.checksum = value;
           }
         }
+        errors={errorsForChecksum}
       />
 
       <fields.EmbeddedInstanceOptional<aas.types.AdministrativeInformation>
@@ -166,6 +242,7 @@ export function ConceptDescriptionFields(
             props.instance.id = value;
           }
         }
+        errors={errorsForId}
       />
 
       <fields.ListFieldOptional<aas.types.EmbeddedDataSpecification>

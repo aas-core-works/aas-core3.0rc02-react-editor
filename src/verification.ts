@@ -791,16 +791,48 @@ export function updateVerificationOnStateChange(
 
     verification.bubbleUpForVerification(something, timestamp);
   } else if (isInstanceOrNull(value) && isInstanceOrNull(previousValue)) {
+    // NOTE (mristin, 2023-02-10):
+    // We have to take the proxy here. Otherwise, the instances which we would
+    // propagate for the verification wouldn't be proxies, but the actual
+    // objects. Changes to the proxies would thus not be reflected in those
+    // actual objects.
+    const instanceProxy = followPathInEnvironment(
+      environment,
+      pathInEnvironment
+    ) as unknown as aas.types.Class | null;
+
+    if (instanceProxy !== null && !(instanceProxy instanceof aas.types.Class)) {
+      console.error(
+        "Expected instanceProxy to be an instance of aas.types.Class, " +
+          "but it is not",
+        instanceProxy
+      );
+      throw new Error("Assertion violation");
+    }
+
+    if (
+      (instanceProxy === null && value !== null) ||
+      (instanceProxy !== null && value == null)
+    ) {
+      console.error(
+        "Expected value and instanceProxy to be in sync, " +
+          "but one is null and the other is not",
+        instanceProxy,
+        value
+      );
+      throw new Error("Assertion violation");
+    }
+
     // NOTE (mristin, 2023-02-03):
     // We assume here that the environment is an object tree where each instance
     // has exactly one parent. Hence, when a property referencing an instance
     // is set, the previous value can be assumed to be removed from
     // the environment.
 
-    if (value !== null) {
+    if (instanceProxy !== null) {
       // We added a new embedded instance.
 
-      verification.bubbleUpForVerification(value, timestamp);
+      verification.bubbleUpForVerification(instanceProxy, timestamp);
     }
 
     if (previousValue !== null) {
@@ -858,4 +890,62 @@ export function updateVerificationOnStateChange(
     );
     throw new Error("Assertion violated");
   }
+}
+
+function compareErrorsByMessages(
+  that: enhancing.TimestampedError,
+  other: enhancing.TimestampedError
+) {
+  if (that.message === other.message) {
+    return 0;
+  }
+  return that.message < other.message ? -1 : 1;
+}
+
+/**
+ * Categorize instance errors into general instance errors and property errors.
+ * @param errors to be categorized
+ * @return `[instance errors, property name => errors]`
+ */
+export function categorizeInstanceErrors(
+  errors: Iterable<enhancing.TimestampedError>
+): [
+  Array<enhancing.TimestampedError>,
+  Map<string, Array<enhancing.TimestampedError>>
+] {
+  const instanceErrors = new Array<enhancing.TimestampedError>();
+  const errorsByProperty = new Map<string, Array<enhancing.TimestampedError>>();
+
+  for (const error of errors) {
+    if (error.relativePathFromInstance.length === 0) {
+      instanceErrors.push(error);
+    } else if (
+      error.relativePathFromInstance.length === 1 &&
+      typeof error.relativePathFromInstance[0] === "string"
+    ) {
+      const propertyName = error.relativePathFromInstance[0];
+
+      const thatErrors = errorsByProperty.get(propertyName);
+      if (thatErrors === undefined) {
+        errorsByProperty.set(propertyName, [error]);
+      } else {
+        thatErrors.push(error);
+      }
+    } else {
+      console.error(
+        "Unexpected instance error with a non-property",
+        error.relativePathFromInstance,
+        error
+      );
+      throw new Error("Assertion violation");
+    }
+  }
+
+  instanceErrors.sort(compareErrorsByMessages);
+
+  for (const propertyErrors of errorsByProperty.values()) {
+    propertyErrors.sort(compareErrorsByMessages);
+  }
+
+  return [instanceErrors, errorsByProperty];
 }

@@ -6,7 +6,6 @@ import * as newinstancing from "../../newinstancing.generated";
 
 import {HelpLink} from "./HelpLink";
 import {ListItem} from "./ListItem"
-import * as enhancing from "../../enhancing.generated";
 
 export function ListFieldRequired<ClassT extends aas.types.Class>(
   props: {
@@ -20,9 +19,40 @@ export function ListFieldRequired<ClassT extends aas.types.Class>(
     setItems: (items: Array<ClassT>) => void
   }
 ) {
+  // See: https://github.com/facebook/react/issues/14476#issuecomment-471199055
+  // and https://stackoverflow.com/questions/59467758/passing-array-to-useeffect-dependency-list
+  const itemsErrorSetVersions = props.items
+    .map((item) => model.getErrorSet(item).versioning.version)
+    .join(",");
+
+  const descendantsWithErrorsVersions =
+    props.items
+      .map(
+        (item) => model.getDescendantsWithErrors(item).versioning.version)
+      .join(",");
+
+  const [hasErrors, setHasErrors] = React.useState(false);
+
+  React.useEffect(
+    () => {
+      setHasErrors(
+        props.items.some(
+          (item) => model.getErrorSet(item).size === 0)
+        || props.items.some(
+        (item) => model.getDescendantsWithErrors(item).size === 0
+        )
+      )
+    },
+    [
+      itemsErrorSetVersions,
+      descendantsWithErrorsVersions
+    ]
+  )
+
+
   return (
     <li>
-      <span className="aas-label"
+      <span className={!hasErrors ? "aas-label" : "aas-label-with-errors"}
       >{props.label}<HelpLink helpUrl={props.helpUrl}/>:</span>
 
       <ul className="aas-list">

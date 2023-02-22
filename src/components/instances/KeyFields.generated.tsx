@@ -11,10 +11,15 @@
 
 import * as aas from "@aas-core-works/aas-core3.0rc02-typescript";
 import * as React from "react";
+import * as valtio from "valtio";
 
-import * as fields from '../fields';
-import * as help from './help.generated';
-import * as newinstancing from '../../newinstancing.generated';
+import * as enhancing from "../../enhancing.generated";
+import * as fields from "../fields";
+import * as help from "./help.generated";
+import * as model from "../../model";
+import * as newinstancing from "../../newinstancing.generated";
+import * as verification from "../../verification";
+import * as widgets from "../widgets";
 
 export function KeyFields(
   props: {
@@ -22,8 +27,54 @@ export function KeyFields(
     instance: aas.types.Key,
   }
 ) {
+  const [instanceErrors, setInstanceErrors] = React.useState<
+    Array<enhancing.TimestampedError> | null>(null);
+
+  const [errorsForType, setErrorsForType] = React.useState<
+    Array<enhancing.TimestampedError> | null>(null);
+
+  const [errorsForValue, setErrorsForValue] = React.useState<
+    Array<enhancing.TimestampedError> | null>(null);
+
+  const snapErrorSetVersioning = valtio.useSnapshot(
+    model.getErrorSet(props.instance).versioning
+  );
+
+  React.useEffect(
+    () => {
+      const [
+        anotherInstanceErrors,
+        errorsByProperty
+      ] = verification.categorizeInstanceErrors(
+        model.getErrorSet(props.instance)
+      );
+
+      setInstanceErrors(anotherInstanceErrors);
+
+      const anotherErrorsForType =
+        errorsByProperty.get("type");
+      setErrorsForType(
+        anotherErrorsForType === undefined
+          ? null
+          : anotherErrorsForType
+      );
+
+      const anotherErrorsForValue =
+        errorsByProperty.get("value");
+      setErrorsForValue(
+        anotherErrorsForValue === undefined
+          ? null
+          : anotherErrorsForValue
+      );
+    },
+    [
+      snapErrorSetVersioning,
+      props.instance
+    ]
+  );
   return (
     <>
+    <widgets.LocalErrors errors={instanceErrors} />
       <fields.EnumerationFieldRequired
         label="Type"
         helpUrl={
@@ -37,6 +88,7 @@ export function KeyFields(
             props.instance.type = value;
           }
         }
+        errors={errorsForType}
       />
 
       <fields.TextFieldRequired
@@ -50,6 +102,7 @@ export function KeyFields(
             props.instance.value = value;
           }
         }
+        errors={errorsForValue}
       />
     </>
   )

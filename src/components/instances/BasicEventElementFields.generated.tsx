@@ -11,10 +11,15 @@
 
 import * as aas from "@aas-core-works/aas-core3.0rc02-typescript";
 import * as React from "react";
+import * as valtio from "valtio";
 
-import * as fields from '../fields';
-import * as help from './help.generated';
-import * as newinstancing from '../../newinstancing.generated';
+import * as enhancing from "../../enhancing.generated";
+import * as fields from "../fields";
+import * as help from "./help.generated";
+import * as model from "../../model";
+import * as newinstancing from "../../newinstancing.generated";
+import * as verification from "../../verification";
+import * as widgets from "../widgets";
 
 export function BasicEventElementFields(
   props: {
@@ -22,8 +27,142 @@ export function BasicEventElementFields(
     instance: aas.types.BasicEventElement,
   }
 ) {
+  const [instanceErrors, setInstanceErrors] = React.useState<
+    Array<enhancing.TimestampedError> | null>(null);
+
+  const [errorsForCategory, setErrorsForCategory] = React.useState<
+    Array<enhancing.TimestampedError> | null>(null);
+
+  const [errorsForIdShort, setErrorsForIdShort] = React.useState<
+    Array<enhancing.TimestampedError> | null>(null);
+
+  const [errorsForChecksum, setErrorsForChecksum] = React.useState<
+    Array<enhancing.TimestampedError> | null>(null);
+
+  const [errorsForKind, setErrorsForKind] = React.useState<
+    Array<enhancing.TimestampedError> | null>(null);
+
+  const [errorsForDirection, setErrorsForDirection] = React.useState<
+    Array<enhancing.TimestampedError> | null>(null);
+
+  const [errorsForState, setErrorsForState] = React.useState<
+    Array<enhancing.TimestampedError> | null>(null);
+
+  const [errorsForMessageTopic, setErrorsForMessageTopic] = React.useState<
+    Array<enhancing.TimestampedError> | null>(null);
+
+  const [errorsForLastUpdate, setErrorsForLastUpdate] = React.useState<
+    Array<enhancing.TimestampedError> | null>(null);
+
+  const [errorsForMinInterval, setErrorsForMinInterval] = React.useState<
+    Array<enhancing.TimestampedError> | null>(null);
+
+  const [errorsForMaxInterval, setErrorsForMaxInterval] = React.useState<
+    Array<enhancing.TimestampedError> | null>(null);
+
+  const snapErrorSetVersioning = valtio.useSnapshot(
+    model.getErrorSet(props.instance).versioning
+  );
+
+  React.useEffect(
+    () => {
+      const [
+        anotherInstanceErrors,
+        errorsByProperty
+      ] = verification.categorizeInstanceErrors(
+        model.getErrorSet(props.instance)
+      );
+
+      setInstanceErrors(anotherInstanceErrors);
+
+      const anotherErrorsForCategory =
+        errorsByProperty.get("category");
+      setErrorsForCategory(
+        anotherErrorsForCategory === undefined
+          ? null
+          : anotherErrorsForCategory
+      );
+
+      const anotherErrorsForIdShort =
+        errorsByProperty.get("idShort");
+      setErrorsForIdShort(
+        anotherErrorsForIdShort === undefined
+          ? null
+          : anotherErrorsForIdShort
+      );
+
+      const anotherErrorsForChecksum =
+        errorsByProperty.get("checksum");
+      setErrorsForChecksum(
+        anotherErrorsForChecksum === undefined
+          ? null
+          : anotherErrorsForChecksum
+      );
+
+      const anotherErrorsForKind =
+        errorsByProperty.get("kind");
+      setErrorsForKind(
+        anotherErrorsForKind === undefined
+          ? null
+          : anotherErrorsForKind
+      );
+
+      const anotherErrorsForDirection =
+        errorsByProperty.get("direction");
+      setErrorsForDirection(
+        anotherErrorsForDirection === undefined
+          ? null
+          : anotherErrorsForDirection
+      );
+
+      const anotherErrorsForState =
+        errorsByProperty.get("state");
+      setErrorsForState(
+        anotherErrorsForState === undefined
+          ? null
+          : anotherErrorsForState
+      );
+
+      const anotherErrorsForMessageTopic =
+        errorsByProperty.get("messageTopic");
+      setErrorsForMessageTopic(
+        anotherErrorsForMessageTopic === undefined
+          ? null
+          : anotherErrorsForMessageTopic
+      );
+
+      const anotherErrorsForLastUpdate =
+        errorsByProperty.get("lastUpdate");
+      setErrorsForLastUpdate(
+        anotherErrorsForLastUpdate === undefined
+          ? null
+          : anotherErrorsForLastUpdate
+      );
+
+      const anotherErrorsForMinInterval =
+        errorsByProperty.get("minInterval");
+      setErrorsForMinInterval(
+        anotherErrorsForMinInterval === undefined
+          ? null
+          : anotherErrorsForMinInterval
+      );
+
+      const anotherErrorsForMaxInterval =
+        errorsByProperty.get("maxInterval");
+      setErrorsForMaxInterval(
+        anotherErrorsForMaxInterval === undefined
+          ? null
+          : anotherErrorsForMaxInterval
+      );
+    },
+    [
+      snapErrorSetVersioning,
+      props.instance
+    ]
+  );
   return (
     <>
+    <widgets.LocalErrors errors={instanceErrors} />
       <fields.ListFieldOptional<aas.types.Extension>
         label="Extensions"
         helpUrl={
@@ -58,6 +197,7 @@ export function BasicEventElementFields(
             props.instance.category = value;
           }
         }
+        errors={errorsForCategory}
       />
 
       <fields.TextFieldOptional
@@ -71,6 +211,7 @@ export function BasicEventElementFields(
             props.instance.idShort = value;
           }
         }
+        errors={errorsForIdShort}
       />
 
       <fields.ListFieldOptional<aas.types.LangString>
@@ -130,6 +271,7 @@ export function BasicEventElementFields(
             props.instance.checksum = value;
           }
         }
+        errors={errorsForChecksum}
       />
 
       <fields.EnumerationFieldOptional
@@ -145,6 +287,7 @@ export function BasicEventElementFields(
             props.instance.kind = value;
           }
         }
+        errors={errorsForKind}
       />
 
       <fields.EmbeddedInstanceOptional<aas.types.Reference>
@@ -275,6 +418,7 @@ export function BasicEventElementFields(
             props.instance.direction = value;
           }
         }
+        errors={errorsForDirection}
       />
 
       <fields.EnumerationFieldRequired
@@ -290,6 +434,7 @@ export function BasicEventElementFields(
             props.instance.state = value;
           }
         }
+        errors={errorsForState}
       />
 
       <fields.TextFieldOptional
@@ -303,6 +448,7 @@ export function BasicEventElementFields(
             props.instance.messageTopic = value;
           }
         }
+        errors={errorsForMessageTopic}
       />
 
       <fields.EmbeddedInstanceOptional<aas.types.Reference>
@@ -339,6 +485,7 @@ export function BasicEventElementFields(
             props.instance.lastUpdate = value;
           }
         }
+        errors={errorsForLastUpdate}
       />
 
       <fields.TextFieldOptional
@@ -352,6 +499,7 @@ export function BasicEventElementFields(
             props.instance.minInterval = value;
           }
         }
+        errors={errorsForMinInterval}
       />
 
       <fields.TextFieldOptional
@@ -365,6 +513,7 @@ export function BasicEventElementFields(
             props.instance.maxInterval = value;
           }
         }
+        errors={errorsForMaxInterval}
       />
     </>
   )
