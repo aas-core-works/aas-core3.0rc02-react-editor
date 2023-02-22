@@ -328,10 +328,10 @@ class ErrorMap {
   }
 }
 
-function* overInstanceAndItsAntecedents(
+function* overAntecedents(
   instance: aas.types.Class
 ): IterableIterator<aas.types.Class> {
-  let cursor: aas.types.Class | null = instance;
+  let cursor: aas.types.Class | null = model.getParent(instance);
 
   while (true) {
     if (cursor === null) {
@@ -350,7 +350,14 @@ function* overInstanceAndItsAntecedents(
   }
 }
 
-function* overInstanceAndItsDescendents(
+function* overInstanceAndAntecedents(
+  instance: aas.types.Class
+): IterableIterator<aas.types.Class> {
+  yield* overAntecedents(instance);
+  yield instance;
+}
+
+function* overInstanceAndDescendants(
   instance: aas.types.Class
 ): IterableIterator<aas.types.Class> {
   yield instance;
@@ -381,11 +388,10 @@ export class Verification {
    */
   bubbleUpForVerification(instance: aas.types.Class, timestamp: number): void {
     this.verificationMap.update(
-      overInstanceAndItsAntecedents(instance),
+      overInstanceAndAntecedents(instance),
       timestamp
     );
-
-    this.errorMap.remove(overInstanceAndItsDescendents(instance));
+    this.errorMap.remove(overInstanceAndAntecedents(instance));
   }
 
   /**
@@ -398,8 +404,8 @@ export class Verification {
    * @param instance that was removed from the environment
    */
   plopDownFromVerification(instance: aas.types.Class) {
-    this.verificationMap.remove(overInstanceAndItsDescendents(instance));
-    this.errorMap.remove(overInstanceAndItsDescendents(instance));
+    this.verificationMap.remove(overInstanceAndDescendants(instance));
+    this.errorMap.remove(overInstanceAndDescendants(instance));
   }
 }
 
@@ -836,6 +842,11 @@ export function updateVerificationOnStateChange(
     if (previousValue !== null) {
       // We removed an existing embedded instance.
 
+      const parent = model.getParent(previousValue);
+      if (parent !== null) {
+        verification.bubbleUpForVerification(parent, timestamp);
+      }
+
       verification.plopDownFromVerification(previousValue);
     }
   } else if (
@@ -866,6 +877,11 @@ export function updateVerificationOnStateChange(
 
     for (const instance of previousValueSet) {
       if (!valueSet.has(instance)) {
+        const parent = model.getParent(instance);
+        if (parent !== null) {
+          verification.bubbleUpForVerification(parent, timestamp);
+        }
+
         verification.plopDownFromVerification(instance);
       }
     }
