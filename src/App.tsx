@@ -6,8 +6,7 @@ import * as model from "./model"
 import * as verification from "./verification"
 
 import './App.css'
-import * as enhancing from "./enhancing.generated";
-import * as emptory from "./emptory.generated";
+import * as debugconf from "./debugconf";
 
 function useUnload<FuncT extends (event: BeforeUnloadEvent) => any>(
   func: FuncT
@@ -32,6 +31,10 @@ function App(props: {
   const snapState =
     valtio.useSnapshot(props.state) as Readonly<typeof props.state>;
 
+  const snapErrorMapVersioning = valtio.useSnapshot(
+    props.verification.errorMap.versioning
+  );
+
   useUnload((event) => {
     event.preventDefault();
   })
@@ -50,6 +53,15 @@ function App(props: {
     },
     [props.verification]
   )
+
+  if (debugconf.DEBUG_WITH_INVARIANTS) {
+    React.useEffect(() => {
+      props.verification.errorMap.assertErrorCountCorrect(
+        snapState.environment
+      );
+    },
+      [snapErrorMapVersioning, snapState])
+  }
 
   React.useEffect(() => {
       // noinspection UnnecessaryLocalVariableJS
@@ -113,7 +125,7 @@ function App(props: {
 
       <components.Errors
         verification={props.verification}
-        snapEnvironment={snapState.environment}
+        environment={props.state.environment}
       />
     </div>
   )

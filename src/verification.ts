@@ -21,11 +21,12 @@
  * the number of errors to an arbitrary constant, and stop the verification
  * at that point. The verification then resumes again on new changes.
  */
+
 import * as aas from "@aas-core-works/aas-core3.0rc02-typescript";
 import * as valtio from "valtio";
 
 import * as debugconf from "./debugconf";
-import * as incrementalid from "./incrementalid";
+import * as enhancing from "./enhancing.generated";
 import * as model from "./model";
 
 /**
@@ -149,56 +150,12 @@ class VerificationMap {
   }
 }
 
-function stringifyPath(path: Array<number | string>): string {
-  if (path.length === 0) {
-    return "";
-  }
-
-  // NOTE (2023-02-10):
-  // See: https://stackoverflow.com/questions/16696632/most-efficient-way-to-concatenate-strings-in-javascript
-  // for string concatenation.
-  let result = "";
-
-  for (const segment of path) {
-    if (typeof segment === "string") {
-      result += `.${segment}`;
-    } else {
-      result += `[${segment}]`;
-    }
-  }
-
-  return result;
-}
-
-/**
- * Represent an error with a timestamp of the change.
- */
-export class TimestampedError {
-  constructor(
-    public message: string,
-    public instance: aas.types.Class,
-    public relativePathFromInstance: Array<number | string>,
-    public timestamp: number,
-    public guid = incrementalid.next()
-  ) {}
-
-  pathAsString(): string {
-    const path = model.collectPath(this.instance);
-    path.push(...this.relativePathFromInstance);
-
-    return stringifyPath(path);
-  }
-}
-
 /**
  * Map the errors to the corresponding instances.
  */
 class ErrorMap {
   // NOTE (mristin, 2023-02-10):
   // See the note "Why our IDs?" for why we use our IDs here as the key.
-
-  // Our ID -> (error key -> error)
-  private readonly map = new Map<string, Map<string, TimestampedError>>();
 
   readonly versioning: Versioning = valtio.proxy(new Versioning());
 
@@ -208,101 +165,100 @@ class ErrorMap {
     return this._errorCount;
   }
 
-  private assertErrorCountCorrect(): void {
+  assertErrorCountCorrect(root: aas.types.Class): void {
     let expectedErrorCount = 0;
-    for (const instanceErrors of this.map.values()) {
-      expectedErrorCount += instanceErrors.size;
+
+    expectedErrorCount += model.getErrorSet(root).size;
+
+    for (const instance of root.descend()) {
+      expectedErrorCount += model.getErrorSet(instance).size;
     }
 
     if (expectedErrorCount !== this.errorCount) {
       console.error(
         `Counted ${expectedErrorCount} actual error(s), ` +
-          `but errorCount is ${this.errorCount}`,
-        this.map
+          `but errorCount is ${this.errorCount}`
       );
       throw new Error("Assertion violation");
     }
   }
 
   /**
-   * Mark the error for each instance given its timestamp of the change.
+   * Mark the instance with errors.
    *
-   * @remarks
-   * If there are entries with the exactly same errors but different timestamps,
-   * the more recent error is kept.
-   *
-   * We have to update the map in bulk so that we do not waste version numbers.
-   * Otherwise, we might overflow very soon when dealing with very large
-   * environments.
-   *
-   * @param instancesTimestampedErrors batch to be inserted
+   * @param instance causing the errors
+   * @param errors discovered in the verification
    */
-  update(
-    instancesTimestampedErrors: IterableIterator<
-      [aas.types.Class, TimestampedError]
-    >
+  mark(
+    instance: aas.types.Class,
+    errors: IterableIterator<enhancing.TimestampedError>
   ) {
     let shouldBumpVersion = false;
+    const errorSet = model.getErrorSet(instance);
 
-    for (const [instance, timestampedError] of instancesTimestampedErrors) {
-      const errorKey =
-        stringifyPath(timestampedError.relativePathFromInstance) +
-        `: ${timestampedError.message}`;
+    if (errorSet.size > 0) {
+      this._errorCount -= errorSet.size;
+      shouldBumpVersion = true;
+      errorSet.clear();
+    }
 
-      const ourId = model.getOurId(instance);
-
-      let instanceErrors = this.map.get(ourId);
-      if (instanceErrors === undefined) {
-        instanceErrors = new Map<string, TimestampedError>();
-        instanceErrors.set(errorKey, timestampedError);
-        this.map.set(ourId, instanceErrors);
-
-        this._errorCount++;
-
-        shouldBumpVersion = true;
-      } else {
-        const previousTimestampError = instanceErrors.get(errorKey);
-
-        if (previousTimestampError === undefined) {
-          instanceErrors.set(errorKey, timestampedError);
-          this._errorCount++;
-          shouldBumpVersion = true;
-        } else {
-          if (previousTimestampError.timestamp < timestampedError.timestamp) {
-            instanceErrors.set(errorKey, timestampedError);
-            shouldBumpVersion = true;
-          }
+    let observedNewErrors = false;
+    for (const error of errors) {
+      if (debugconf.DEBUG_WITH_INVARIANTS) {
+        if (error.instance !== instance) {
+          console.error(
+            "The given error should have been associated with the given " +
+              "instance, but it was not",
+            instance,
+            error
+          );
+          throw new Error("Assertion violation");
         }
       }
+
+      observedNewErrors = true;
+      shouldBumpVersion = true;
+      this._errorCount++;
+
+      errorSet.add(error);
+    }
+
+    if (!observedNewErrors) {
+      // Since there are no errors, we have to *remove* the instance
+      // in the records of the antecedents.
+      for (const antecedent of overAntecedents(instance)) {
+        model.getDescendantsWithErrors(antecedent).delete(instance);
+      }
+    } else {
+      for (const antecedent of overAntecedents(instance)) {
+        model.getDescendantsWithErrors(antecedent).add(instance);
+      }
     }
 
     if (shouldBumpVersion) {
       this.versioning.version++;
     }
-
-    if (debugconf.DEBUG_WITH_INVARIANTS) {
-      this.assertErrorCountCorrect();
-    }
   }
 
   /**
-   * Unmark the instances from the error map.
+   * Unmark the instances from errors.
    *
-   * @remarks
-   * We have to update the map in bulk so that we do not waste version numbers.
-   * Otherwise, we might overflow very soon when dealing with very large
-   * environments.
-   *
-   * @param instances to be removed from the error map.
+   * @param instances to be unmarked.
    */
-  remove(instances: IterableIterator<aas.types.Class>): void {
+  unmark(instances: IterableIterator<aas.types.Class>): void {
     let shouldBumpVersion = false;
     for (const instance of instances) {
-      const ourId = model.getOurId(instance);
-      const instanceErrors = this.map.get(ourId);
-      if (instanceErrors !== undefined) {
-        this.map.delete(ourId);
-        this._errorCount -= instanceErrors.size;
+      const errorSet = model.getErrorSet(instance);
+
+      if (errorSet.size > 0) {
+        this._errorCount -= errorSet.size;
+        errorSet.clear();
+
+        // Update now the antecedents
+        for (const antecedent of overAntecedents(instance)) {
+          model.getDescendantsWithErrors(antecedent).delete(instance);
+        }
+
         shouldBumpVersion = true;
       }
     }
@@ -310,20 +266,20 @@ class ErrorMap {
     if (shouldBumpVersion) {
       this.versioning.version++;
     }
-
-    if (debugconf.DEBUG_WITH_INVARIANTS) {
-      this.assertErrorCountCorrect();
-    }
   }
 
   /**
-   * Iterate over all the contained errors in an arbitrary order.
+   * Collect all the errors from the `root` and its descendants.
+   *
+   * @param root where the collection starts
    */
-  *errors(): IterableIterator<TimestampedError> {
-    for (const instanceErrors of this.map.values()) {
-      for (const error of instanceErrors.values()) {
-        yield error;
-      }
+  *collect(
+    root: aas.types.Class
+  ): IterableIterator<enhancing.TimestampedError> {
+    yield* model.getErrorSet(root);
+
+    for (const descendent of model.getDescendantsWithErrors(root)) {
+      yield* model.getErrorSet(descendent);
     }
   }
 }
@@ -391,7 +347,8 @@ export class Verification {
       overInstanceAndAntecedents(instance),
       timestamp
     );
-    this.errorMap.remove(overInstanceAndAntecedents(instance));
+
+    this.errorMap.unmark(overInstanceAndAntecedents(instance));
   }
 
   /**
@@ -405,7 +362,7 @@ export class Verification {
    */
   plopDownFromVerification(instance: aas.types.Class) {
     this.verificationMap.remove(overInstanceAndDescendants(instance));
-    this.errorMap.remove(overInstanceAndDescendants(instance));
+    this.errorMap.unmark(overInstanceAndDescendants(instance));
   }
 }
 
@@ -505,31 +462,36 @@ export class ContinuousVerification {
 
       const batch = timestampedInstances.slice(0, 100);
 
-      const instancesTimestampedErrors = new Array<
-        [aas.types.Class, TimestampedError]
+      const instancesToTimestampedErrors = new Array<
+        [aas.types.Class, Array<enhancing.TimestampedError>]
       >();
+      let countOfNewErrors = 0;
 
       let reachedTheCap = false;
 
       for (const { instance, timestamp } of batch) {
+        const instanceErrors = new Array<enhancing.TimestampedError>();
+
         for (const error of aas.verification.verify(instance, false)) {
-          instancesTimestampedErrors.push([
-            instance,
-            new TimestampedError(
+          instanceErrors.push(
+            new enhancing.TimestampedError(
               error.message,
               instance,
               aasVerificationPathToArrayOfPrimitives(error.path),
               timestamp
-            ),
-          ]);
+            )
+          );
 
-          if (
-            previousErrorCount + instancesTimestampedErrors.length ===
-            context.errorCap
-          ) {
+          countOfNewErrors++;
+
+          if (previousErrorCount + countOfNewErrors === context.errorCap) {
             reachedTheCap = true;
             break;
           }
+        }
+
+        if (instanceErrors.length > 0) {
+          instancesToTimestampedErrors.push([instance, instanceErrors]);
         }
 
         if (reachedTheCap) {
@@ -548,7 +510,9 @@ export class ContinuousVerification {
       context.verificationMap.remove(overInstances());
 
       // Mark the instances with timestamped errors
-      context.errorMap.update(instancesTimestampedErrors.values());
+      for (const [instance, instanceErrors] of instancesToTimestampedErrors) {
+        context.errorMap.mark(instance, instanceErrors.values());
+      }
 
       if (context.verificationMap.size >= oldVerificationMapSize) {
         console.error(

@@ -2,6 +2,7 @@ import * as aas from "@aas-core-works/aas-core3.0rc02-typescript";
 
 import * as emptory from "./emptory.generated";
 import * as enhancing from "./enhancing.generated";
+import { TimestampedError, VersionedSet } from "./enhancing.generated";
 
 /**
  * Provide model of the app.
@@ -228,6 +229,36 @@ export function moveInContainer<ClassT extends aas.types.Class>(
   newContainer[sourceIndex] = tmp;
 
   return newContainer;
+}
+
+export function getErrorSet(
+  instance: aas.types.Class
+): VersionedSet<TimestampedError> {
+  const enhanced = enhancing.asEnhanced(instance);
+  if (enhanced === null) {
+    console.error(
+      "Expected the instance to have been enhanced, but it was not",
+      instance
+    );
+    throw new Error("Assertion violated");
+  }
+
+  return enhanced._aasCoreEditorEnhancement.errors;
+}
+
+export function getDescendantsWithErrors(
+  instance: aas.types.Class
+): VersionedSet<aas.types.Class> {
+  const enhanced = enhancing.asEnhanced(instance);
+  if (enhanced === null) {
+    console.error(
+      "Expected the instance to have been enhanced, but it was not",
+      instance
+    );
+    throw new Error("Assertion violated");
+  }
+
+  return enhanced._aasCoreEditorEnhancement.descendantsWithErrors;
 }
 
 export const INITIAL_FILENAME = "untitled.json";

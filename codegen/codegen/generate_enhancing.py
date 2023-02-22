@@ -167,7 +167,92 @@ def generate(symbol_table: intermediate.SymbolTable) -> Stripped:
         Stripped(
             """\
 import * as aas from "@aas-core-works/aas-core3.0rc02-typescript";
-import * as incrementalid from "./incrementalid";"""
+import * as valtio from "valtio";
+
+import * as incrementalid from "./incrementalid";
+import * as model from "./model";"""
+        ),
+        Stripped(
+            f"""\
+/**
+ * Represent an error with a timestamp of the change.
+ */
+export class TimestampedError {{
+{I}constructor(
+{II}public message: string,
+{II}public instance: aas.types.Class,
+{II}public relativePathFromInstance: Array<number | string>,
+{II}public timestamp: number,
+{II}public guid = incrementalid.next()
+{I}) {{}}
+
+{I}pathAsString(): string {{
+{II}const path = model.collectPath(this.instance);
+{II}path.push(...this.relativePathFromInstance);
+
+{II}if (path.length === 0) {{
+{III}return "";
+{II}}}
+
+{II}// NOTE (2023-02-10):
+{II}// See: https://stackoverflow.com/questions/16696632/most-efficient-way-to-concatenate-strings-in-javascript
+{II}// for string concatenation.
+{II}let result = "";
+
+{II}for (const segment of path) {{
+{III}if (typeof segment === "string") {{
+{III}  result += `.${{segment}}`;
+{III}}} else {{
+{III}  result += `[${{segment}}]`;
+{III}}}
+{II}}}
+
+{II}return result;
+{I}}}
+}}"""
+        ),
+        Stripped(
+            f"""\
+export class VersionedSet<T> {{
+{I}private readonly content = new Set<T>();
+{I}private readonly versioning = valtio.proxy({{ version: 0 }});
+
+{I}*[Symbol.iterator]() {{
+{II}yield* this.content;
+{I}}}
+
+{I}add(item: T) {{
+{II}let bumpVersion = false;
+{II}if (!this.content.has(item)) {{
+{III}this.content.add(item);
+{III}bumpVersion = true;
+{II}}}
+
+{II}if (bumpVersion) {{
+{III}this.versioning.version++;
+{II}}}
+{I}}}
+{I}
+{I}delete(item: T) {{
+{II}const bumpVersion = this.content.delete(item);
+{II}if (bumpVersion) {{
+{III}this.versioning.version++;
+{II}}}
+{I}}}
+{I}
+{I}clear() {{
+{II}if (this.content.size === 0) {{
+{III}return;
+{II}}}
+
+{II}this.content.clear();
+{II}this.versioning.version++;
+{I}}}
+
+{I}public get size() {{
+{II}return this.content.size;
+{I}}}
+}}"""
         ),
         Stripped(
             f"""\
@@ -175,6 +260,8 @@ class Enhancement {{
 {I}id: string;
 {I}parent: aas.types.Class | null;
 {I}relativePathFromParent: Array<number | string>
+{I}errors = valtio.ref(new VersionedSet<TimestampedError>());
+{I}descendantsWithErrors = valtio.ref(new VersionedSet<aas.types.Class>());
 
 {I}constructor(
 {II}id: string,
