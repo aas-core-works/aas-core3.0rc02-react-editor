@@ -40,9 +40,9 @@ def is_non_composite_property(prop: intermediate.Property) -> bool:
         or (
             isinstance(type_anno, intermediate.OurTypeAnnotation)
             and (
-                isinstance(type_anno.our_type, intermediate.Enumeration)
-                or isinstance(
-                    type_anno.our_type, intermediate.ConstrainedPrimitive
+                isinstance(
+                    type_anno.our_type,
+                    (intermediate.Enumeration, intermediate.ConstrainedPrimitive)
                 )
             )
         )
@@ -52,7 +52,7 @@ def is_non_composite_property(prop: intermediate.Property) -> bool:
 
 @require(lambda cls, prop: id(prop) in cls.property_id_set)
 def _generate_field_for_property(
-        cls: intermediate.ConcreteClass, prop: intermediate.Property
+    cls: intermediate.ConcreteClass, prop: intermediate.Property
 ) -> Stripped:
     """Generate the field for a property of a class."""
     label = codegen.common.identifier_as_label(prop.name)
@@ -72,8 +72,8 @@ def _generate_field_for_property(
     )
 
     if isinstance(type_anno, intermediate.PrimitiveTypeAnnotation) or (
-            isinstance(type_anno, intermediate.OurTypeAnnotation)
-            and isinstance(type_anno.our_type, intermediate.ConstrainedPrimitive)
+        isinstance(type_anno, intermediate.OurTypeAnnotation)
+        and isinstance(type_anno.our_type, intermediate.ConstrainedPrimitive)
     ):
         primitive_type = intermediate.try_primitive_type(type_anno)
         assert primitive_type is not None
@@ -176,7 +176,7 @@ def _generate_field_for_property(
                 f"Expected to handle {our_type.__class__.__name__} before"
             )
         elif isinstance(
-                our_type, (intermediate.AbstractClass, intermediate.ConcreteClass)
+            our_type, (intermediate.AbstractClass, intermediate.ConcreteClass)
         ):
             embedded_type_name = typescript_naming.class_name(our_type.name)
 
@@ -279,9 +279,7 @@ const [instanceErrors, setInstanceErrors] = React.useState<
     ]  # type: List[Stripped]
 
     non_composite_properties = [
-        prop
-        for prop in cls.properties
-        if is_non_composite_property(prop)
+        prop for prop in cls.properties if is_non_composite_property(prop)
     ]  # type: List[intermediate.Property]
 
     for prop in non_composite_properties:
@@ -448,7 +446,7 @@ export function {component_name}(
 
 
 def _generate_fielding(
-        symbol_table: intermediate.SymbolTable,
+    symbol_table: intermediate.SymbolTable,
 ) -> Stripped:
     """Generate the fielding module to associate instances with fields components."""
     concrete_classes = [
@@ -551,9 +549,9 @@ export function componentFor(
 
 
 def generate(
-        symbol_table: intermediate.SymbolTable,
-        instances_dir: pathlib.Path,
-        model_id: Stripped,
+    symbol_table: intermediate.SymbolTable,
+    instances_dir: pathlib.Path,
+    model_id: Stripped,
 ) -> None:
     """Generate the files which define fields for instances of concrete classes."""
     exports = []  # type: List[str]
