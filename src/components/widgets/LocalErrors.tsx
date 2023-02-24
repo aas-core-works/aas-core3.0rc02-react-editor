@@ -18,7 +18,7 @@ export function LocalErrors(
         {
           props.errors?.map((error) => {
               return (
-                <li key={error.guid}>
+                <li key={error.guid} id={`localized-error-${error.guid}`}>
                   <span className="aas-error-message">{error.message}</span>
                 </li>
               );
