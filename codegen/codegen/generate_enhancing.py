@@ -17,7 +17,7 @@ from aas_core_codegen.typescript.common import (
     INDENT as I,
     INDENT2 as II,
     INDENT3 as III,
-    INDENT4 as IIII
+    INDENT4 as IIII,
 )
 
 import codegen.common
