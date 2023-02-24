@@ -110,11 +110,35 @@ function App(props: {
     [props.state]
   )
 
+  React.useEffect(() => {
+      function handleKey(event: KeyboardEvent) {
+        if (event.altKey && event.key === 'n') {
+          event.preventDefault();
+          props.state.enqueuedAction = model.ACTION_NEW;
+        } else if (event.altKey && event.key === 's') {
+          event.preventDefault();
+          props.state.enqueuedAction = model.ACTION_SAVE;
+        } else if (event.altKey && event.key === 'o') {
+          event.preventDefault();
+          props.state.enqueuedAction = model.ACTION_OPEN;
+        }
+        return false;
+      }
+
+      document.addEventListener('keydown', handleKey);
+    return () => {
+      document.removeEventListener('keydown', handleKey);
+    };
+  },
+    [snapState.enqueuedAction]
+  );
+
+
   return (
     <div className="App">
       <div id="toolbar">
         <components.NewButton state={props.state}/>
-        <components.ExportAsJsonButton snap={snapState}/>
+        <components.ExportAsJsonButton state={props.state}/>
         <components.ImportFromJsonButton state={props.state}/>
       </div>
 

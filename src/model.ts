@@ -263,9 +263,18 @@ export function getDescendantsWithErrors(
 
 export const INITIAL_FILENAME = "untitled.json";
 
+export const ACTION_NEW = "new";
+export const ACTION_OPEN = "open";
+export const ACTION_SAVE = "save";
+export type Action =
+  | typeof ACTION_NEW
+  | typeof ACTION_OPEN
+  | typeof ACTION_SAVE;
+
 export class State {
   fileName: string;
   environment: enhancing.Enhanced<aas.types.Environment>;
+  enqueuedAction: Action | null = null;
 
   constructor() {
     this.fileName = INITIAL_FILENAME;
