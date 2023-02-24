@@ -36,7 +36,7 @@ export function NewButton(props: { state: model.State }) {
 
   return (
     <>
-      <button onClick={showDialogue}>New</button>
+      <button onClick={showDialogue} title="alt+n">New</button>
       <widgets.OkCancelScreen
         message={dialogueMessage}
         onOk={

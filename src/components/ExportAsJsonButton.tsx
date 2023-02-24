@@ -37,7 +37,7 @@ export function ExportAsJsonButton(
   )
 
   return (
-    <button onClick={save}>
+    <button onClick={save} title="alt+s">
       Export as JSON
     </button>
   );

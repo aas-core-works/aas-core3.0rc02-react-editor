@@ -85,7 +85,10 @@ export function ImportFromJsonButton(props: { state: model.State }) {
 
   return (
     <>
-    <button onClick={open}>
+    <button
+      onClick={open}
+      title="alt+o"
+    >
       Import from JSON
     </button>
     <widgets.SplashScreen message={splashMessage} />
