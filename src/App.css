@@ -83,3 +83,7 @@ h1.aas-environment-title-with-errors {
 div.aas-errors h1 {
     color: red;
 }
+
+li.aas-error:hover {
+    cursor: pointer;
+}

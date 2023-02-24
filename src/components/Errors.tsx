@@ -97,7 +97,29 @@ export function Errors(
           (timestampedErrors?.map(
             (timestampedError) => {
               return (
-                <li key={timestampedError.guid}>
+                <li
+                  className="aas-error"
+                  key={timestampedError.guid}
+                  onClick={
+                    () => {
+                      const elementId =
+                        `localized-error-${timestampedError.guid}`;
+
+                      const element = document.getElementById(elementId);
+
+                      if (element === null) {
+                        console.error(
+                          "Could not find the element that we wanted " +
+                          "to scroll to", elementId
+                        )
+                        throw new Error("Assertion violation");
+                      }
+                      element.scrollIntoView(
+                        {block: 'start', behavior: 'smooth'}
+                      );
+                    }
+                  }
+                >
                   <span className="aas-error-path">
                     {timestampedError.pathAsString()}
                   </span>
