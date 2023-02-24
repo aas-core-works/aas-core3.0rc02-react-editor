@@ -1,39 +1,31 @@
 import * as React from "react";
 
-import * as incrementalid from "../../incrementalid";
 import * as widgets from '../widgets'
+import * as enhancing from "../../enhancing.generated";
 
-import {HelpLink} from "./HelpLink";
+import {NonCompositeField} from "./NonCompositeField";
 
 export function TextFieldOptional(
   props: {
     label: string,
     helpUrl: string | null,
     value: string | null,
-    onChange: (value: string | null) => void
+    onChange: (value: string | null) => void,
+    errors: Array<enhancing.TimestampedError> | null
   }
 ) {
-  const inputId = React.useState(incrementalid.next())[0];
-
   return (
-    <li>
-      <div className="aas-field">
-        <span className="aas-label">
-          {props.label}<HelpLink helpUrl={props.helpUrl}/>:
-        </span>
-
-        <widgets.TextAreaAutoResized
-          id={inputId}
-          content={props.value === null ? "" : props.value}
-          onChange={(content: string) => {
-            if (content === "") {
-              props.onChange(null);
-            } else {
-              props.onChange(content);
-            }
-          }}
-        />
-      </div>
-    </li>
+    <NonCompositeField label={props.label} helpUrl={props.helpUrl} errors={props.errors}>
+      <widgets.TextAreaAutoResized
+        content={props.value === null ? "" : props.value}
+        onChange={(content: string) => {
+          if (content === "") {
+            props.onChange(null);
+          } else {
+            props.onChange(content);
+          }
+        }}
+      />
+    </NonCompositeField>
   )
 }

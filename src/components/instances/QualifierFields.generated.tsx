@@ -11,10 +11,15 @@
 
 import * as aas from "@aas-core-works/aas-core3.0rc02-typescript";
 import * as React from "react";
+import * as valtio from "valtio";
 
-import * as fields from '../fields';
-import * as help from './help.generated';
-import * as newinstancing from '../../newinstancing.generated';
+import * as enhancing from "../../enhancing.generated";
+import * as fields from "../fields";
+import * as help from "./help.generated";
+import * as model from "../../model";
+import * as newinstancing from "../../newinstancing.generated";
+import * as verification from "../../verification";
+import * as widgets from "../widgets";
 
 export function QualifierFields(
   props: {
@@ -22,8 +27,76 @@ export function QualifierFields(
     instance: aas.types.Qualifier,
   }
 ) {
+  const [instanceErrors, setInstanceErrors] = React.useState<
+    Array<enhancing.TimestampedError> | null>(null);
+
+  const [errorsForKind, setErrorsForKind] = React.useState<
+    Array<enhancing.TimestampedError> | null>(null);
+
+  const [errorsForType, setErrorsForType] = React.useState<
+    Array<enhancing.TimestampedError> | null>(null);
+
+  const [errorsForValueType, setErrorsForValueType] = React.useState<
+    Array<enhancing.TimestampedError> | null>(null);
+
+  const [errorsForValue, setErrorsForValue] = React.useState<
+    Array<enhancing.TimestampedError> | null>(null);
+
+  const snapErrorSetVersioning = valtio.useSnapshot(
+    model.getErrorSet(props.instance).versioning
+  );
+
+  React.useEffect(
+    () => {
+      const [
+        anotherInstanceErrors,
+        errorsByProperty
+      ] = verification.categorizeInstanceErrors(
+        model.getErrorSet(props.instance)
+      );
+
+      setInstanceErrors(anotherInstanceErrors);
+
+      const anotherErrorsForKind =
+        errorsByProperty.get("kind");
+      setErrorsForKind(
+        anotherErrorsForKind === undefined
+          ? null
+          : anotherErrorsForKind
+      );
+
+      const anotherErrorsForType =
+        errorsByProperty.get("type");
+      setErrorsForType(
+        anotherErrorsForType === undefined
+          ? null
+          : anotherErrorsForType
+      );
+
+      const anotherErrorsForValueType =
+        errorsByProperty.get("valueType");
+      setErrorsForValueType(
+        anotherErrorsForValueType === undefined
+          ? null
+          : anotherErrorsForValueType
+      );
+
+      const anotherErrorsForValue =
+        errorsByProperty.get("value");
+      setErrorsForValue(
+        anotherErrorsForValue === undefined
+          ? null
+          : anotherErrorsForValue
+      );
+    },
+    [
+      snapErrorSetVersioning,
+      props.instance
+    ]
+  );
   return (
     <>
+    <widgets.LocalErrors errors={instanceErrors} />
       <fields.EmbeddedInstanceOptional<aas.types.Reference>
         label="Semantic id"
         helpUrl={
@@ -83,6 +156,7 @@ export function QualifierFields(
             props.instance.kind = value;
           }
         }
+        errors={errorsForKind}
       />
 
       <fields.TextFieldRequired
@@ -96,6 +170,7 @@ export function QualifierFields(
             props.instance.type = value;
           }
         }
+        errors={errorsForType}
       />
 
       <fields.EnumerationFieldRequired
@@ -111,6 +186,7 @@ export function QualifierFields(
             props.instance.valueType = value;
           }
         }
+        errors={errorsForValueType}
       />
 
       <fields.TextFieldOptional
@@ -124,6 +200,7 @@ export function QualifierFields(
             props.instance.value = value;
           }
         }
+        errors={errorsForValue}
       />
 
       <fields.EmbeddedInstanceOptional<aas.types.Reference>

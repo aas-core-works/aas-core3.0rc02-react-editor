@@ -3,6 +3,7 @@ import io
 import pathlib
 from typing import List
 
+import aas_core_codegen.naming
 from aas_core_codegen.common import (
     Identifier,
     indent_but_first_line,
@@ -24,9 +25,34 @@ from icontract import require
 import codegen.common
 
 
+def is_non_composite_property(prop: intermediate.Property) -> bool:
+    """
+    Check whether ``prop`` is a primitive or enumeration property.
+
+    This is relevant so that we can see if there are errors reported at
+    the corresponding property field. Composite properties report the errors
+    in the embedded instances instead.
+    """
+    type_anno = intermediate.beneath_optional(prop.type_annotation)
+    # fmt: off
+    return (
+        isinstance(type_anno, intermediate.PrimitiveTypeAnnotation)
+        or (
+            isinstance(type_anno, intermediate.OurTypeAnnotation)
+            and (
+                isinstance(type_anno.our_type, intermediate.Enumeration)
+                or isinstance(
+                    type_anno.our_type, intermediate.ConstrainedPrimitive
+                )
+            )
+        )
+    )
+    # fmt: on
+
+
 @require(lambda cls, prop: id(prop) in cls.property_id_set)
 def _generate_field_for_property(
-    cls: intermediate.ConcreteClass, prop: intermediate.Property
+        cls: intermediate.ConcreteClass, prop: intermediate.Property
 ) -> Stripped:
     """Generate the field for a property of a class."""
     label = codegen.common.identifier_as_label(prop.name)
@@ -41,9 +67,13 @@ def _generate_field_for_property(
 
     help_url_literal = f"`${{help.ROOT_URL}}/{cls.name}.html#property-{prop.name}`"
 
+    errors_for_var = typescript_naming.variable_name(
+        Identifier(f"errors_for_{prop.name}")
+    )
+
     if isinstance(type_anno, intermediate.PrimitiveTypeAnnotation) or (
-        isinstance(type_anno, intermediate.OurTypeAnnotation)
-        and isinstance(type_anno.our_type, intermediate.ConstrainedPrimitive)
+            isinstance(type_anno, intermediate.OurTypeAnnotation)
+            and isinstance(type_anno.our_type, intermediate.ConstrainedPrimitive)
     ):
         primitive_type = intermediate.try_primitive_type(type_anno)
         assert primitive_type is not None
@@ -62,6 +92,7 @@ def _generate_field_for_property(
 {III}props.instance.{prop_name} = value;
 {II}}}
 {I}}}
+{I}errors={{{errors_for_var}}}
 />"""
             )
         elif primitive_type is intermediate.PrimitiveType.INT:
@@ -82,6 +113,7 @@ def _generate_field_for_property(
 {III}props.instance.{prop_name} = value;
 {II}}}
 {I}}}
+{I}errors={{{errors_for_var}}}
 />"""
             )
         elif primitive_type is intermediate.PrimitiveType.BYTEARRAY:
@@ -104,6 +136,7 @@ def _generate_field_for_property(
 {II}}}
 {I}}}
 {I}contentType={{{content_type_expr}}}
+{I}errors={{{errors_for_var}}}
 />"""
             )
         else:
@@ -135,6 +168,7 @@ def _generate_field_for_property(
 {III}props.instance.{prop_name} = value;
 {II}}}
 {I}}}
+{I}errors={{{errors_for_var}}}
 />"""
             )
         elif isinstance(our_type, intermediate.ConstrainedPrimitive):
@@ -142,7 +176,7 @@ def _generate_field_for_property(
                 f"Expected to handle {our_type.__class__.__name__} before"
             )
         elif isinstance(
-            our_type, (intermediate.AbstractClass, intermediate.ConcreteClass)
+                our_type, (intermediate.AbstractClass, intermediate.ConcreteClass)
         ):
             embedded_type_name = typescript_naming.class_name(our_type.name)
 
@@ -236,6 +270,120 @@ def _generate_for_cls(cls: intermediate.ConcreteClass, path: pathlib.Path) -> No
     """Generate the component to represent the properties of the ``cls``."""
     cls_name = typescript_naming.class_name(cls.name)
 
+    error_handling_blocks = [
+        Stripped(
+            f"""\
+const [instanceErrors, setInstanceErrors] = React.useState<
+{I}Array<enhancing.TimestampedError> | null>(null);"""
+        )
+    ]  # type: List[Stripped]
+
+    non_composite_properties = [
+        prop
+        for prop in cls.properties
+        if is_non_composite_property(prop)
+    ]  # type: List[intermediate.Property]
+
+    for prop in non_composite_properties:
+        errors_for_var = typescript_naming.variable_name(
+            Identifier(f"errors_for_{prop.name}")
+        )
+        set_errors_for_var = typescript_naming.variable_name(
+            Identifier(f"set_errors_for_{prop.name}")
+        )
+
+        error_handling_blocks.append(
+            Stripped(
+                f"""\
+const [{errors_for_var}, {set_errors_for_var}] = React.useState<
+{I}Array<enhancing.TimestampedError> | null>(null);"""
+            )
+        )
+
+    error_handling_blocks.append(
+        Stripped(
+            f"""\
+const snapErrorSetVersioning = valtio.useSnapshot(
+{I}model.getErrorSet(props.instance).versioning
+);"""
+        )
+    )
+
+    error_effect_blocks = []  # type: List[Stripped]
+
+    if len(non_composite_properties) > 0:
+        error_effect_blocks.append(
+            Stripped(
+                f"""\
+const [
+{I}anotherInstanceErrors,
+{I}errorsByProperty
+] = verification.categorizeInstanceErrors(
+{I}model.getErrorSet(props.instance)
+);
+
+setInstanceErrors(anotherInstanceErrors);"""
+            )
+        )
+    else:
+        error_effect_blocks.append(
+            Stripped(
+                f"""\
+const [
+{I}anotherInstanceErrors,
+{I}_
+] = verification.categorizeInstanceErrors(
+{I}model.getErrorSet(props.instance)
+);
+
+setInstanceErrors(anotherInstanceErrors);"""
+            )
+        )
+
+    for prop in non_composite_properties:
+        another_errors_for_var = typescript_naming.variable_name(
+            Identifier(f"another_errors_for_{prop.name}")
+        )
+        set_errors_for_var = typescript_naming.variable_name(
+            Identifier(f"set_errors_for_{prop.name}")
+        )
+
+        prop_json_name_literal = typescript_common.string_literal(
+            aas_core_codegen.naming.json_property(prop.name)
+        )
+
+        error_effect_blocks.append(
+            Stripped(
+                f"""\
+const {another_errors_for_var} =
+{I}errorsByProperty.get({prop_json_name_literal});
+{set_errors_for_var}(
+{I}{another_errors_for_var} === undefined
+{II}? null
+{II}: {another_errors_for_var}
+);"""
+            )
+        )
+
+    error_effect_blocks_joined = "\n\n".join(error_effect_blocks)
+
+    error_handling_blocks.append(
+        Stripped(
+            f"""\
+React.useEffect(
+{I}() => {{
+{II}{indent_but_first_line(error_effect_blocks_joined, II)}
+{I}}},
+{I}[
+{II}snapErrorSetVersioning,
+{II}props.instance
+{I}]
+);"""
+        )
+    )
+
+    error_handling_blocks_joined = "\n\n".join(error_handling_blocks)
+
     field_blocks = []  # type: List[Stripped]
 
     for prop in cls.properties:
@@ -258,10 +406,15 @@ def _generate_for_cls(cls: intermediate.ConcreteClass, path: pathlib.Path) -> No
             """\
 import * as aas from "@aas-core-works/aas-core3.0rc02-typescript";
 import * as React from "react";
+import * as valtio from "valtio";
 
-import * as fields from '../fields';
-import * as help from './help.generated';
-import * as newinstancing from '../../newinstancing.generated';"""
+import * as enhancing from "../../enhancing.generated";
+import * as fields from "../fields";
+import * as help from "./help.generated";
+import * as model from "../../model";
+import * as newinstancing from "../../newinstancing.generated";
+import * as verification from "../../verification";
+import * as widgets from "../widgets";"""
         ),
         Stripped(
             f"""\
@@ -271,8 +424,10 @@ export function {component_name}(
 {II}instance: aas.types.{cls_name},
 {I}}}
 ) {{
+{I}{indent_but_first_line(error_handling_blocks_joined, I)}
 {I}return (
 {II}<>
+{II}<widgets.LocalErrors errors={{instanceErrors}} />
 {III}{indent_but_first_line(field_blocks_joined, III)}
 {II}</>
 {I})
@@ -293,7 +448,7 @@ export function {component_name}(
 
 
 def _generate_fielding(
-    symbol_table: intermediate.SymbolTable,
+        symbol_table: intermediate.SymbolTable,
 ) -> Stripped:
     """Generate the fielding module to associate instances with fields components."""
     concrete_classes = [
@@ -320,7 +475,8 @@ def _generate_fielding(
 ): React.ReactElement {{
 {I}assertTypesMatch(that, snap);
 
-{I}return {component_name}(
+{I}return React.createElement(
+{II}{component_name},
 {II}{{
 {III}snapInstance: snap,
 {III}instance: that,
@@ -395,9 +551,9 @@ export function componentFor(
 
 
 def generate(
-    symbol_table: intermediate.SymbolTable,
-    instances_dir: pathlib.Path,
-    model_id: Stripped,
+        symbol_table: intermediate.SymbolTable,
+        instances_dir: pathlib.Path,
+        model_id: Stripped,
 ) -> None:
     """Generate the files which define fields for instances of concrete classes."""
     exports = []  # type: List[str]

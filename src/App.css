@@ -54,6 +54,11 @@ span.aas-label {
     margin-right: 1em;
 }
 
+span.aas-label-with-errors {
+    margin-right: 1em;
+    color: red;
+}
+
 div.aas-field {
     display: flex;
     vertical-align: top;
@@ -62,4 +67,19 @@ div.aas-field {
 span.aas-error-path {
     color: red;
     margin-right: 5em;
+}
+span.aas-error-message {
+    color: red;
+}
+
+summary.aas-list-item-with-errors {
+    color: red;
+}
+
+h1.aas-environment-title-with-errors {
+    color: red;
+}
+
+div.aas-errors h1 {
+    color: red;
 }

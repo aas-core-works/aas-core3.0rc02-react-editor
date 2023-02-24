@@ -1,8 +1,8 @@
 import * as React from "react";
 
-import * as incrementalid from "../../incrementalid";
+import * as enhancing from "../../enhancing.generated";
 
-import {HelpLink} from "./HelpLink";
+import {NonCompositeField} from "./NonCompositeField";
 
 export function EnumerationFieldRequired<EnumT extends number>(
   props: {
@@ -11,12 +11,10 @@ export function EnumerationFieldRequired<EnumT extends number>(
     getLiterals: () => IterableIterator<EnumT>,
     literalToString: (literal: EnumT) => string,
     selected: EnumT,
-    onChange: (value: EnumT) => void
+    onChange: (value: EnumT) => void,
+    errors: Array<enhancing.TimestampedError> | null
   }
 ) {
-  // noinspection DuplicatedCode
-  const inputId = React.useState(incrementalid.next())[0];
-
   const valuesAndDescriptions = React.useState<Array<[string, string]>>(
     (() => {
       const realizedValuesAndDescriptions = new Array<[string, string]>();
@@ -33,32 +31,25 @@ export function EnumerationFieldRequired<EnumT extends number>(
   )[0];
 
   return (
-    <li>
-      <div className="aas-field">
-        <span className="aas-label">
-          {props.label}<HelpLink helpUrl={props.helpUrl}/>:
-        </span>
-
-        <select
-          id={inputId}
-          defaultValue={props.selected.toString()}
-          onChange={
-            (event) => {
-              props.onChange(parseInt(event.target.value) as EnumT);
-            }
+    <NonCompositeField label={props.label} helpUrl={props.helpUrl} errors={props.errors}>
+      <select
+        defaultValue={props.selected.toString()}
+        onChange={
+          (event) => {
+            props.onChange(parseInt(event.target.value) as EnumT);
           }
-        >
-          {
-            valuesAndDescriptions.map((valueAndDescription => {
-              const [value, description] = valueAndDescription;
+        }
+      >
+        {
+          valuesAndDescriptions.map((valueAndDescription => {
+            const [value, description] = valueAndDescription;
 
-              return (
-                <option key={value} value={value}>{description}</option>
-              )
-            }))
-          }
-        </select>
-      </div>
-    </li>
+            return (
+              <option key={value} value={value}>{description}</option>
+            )
+          }))
+        }
+      </select>
+    </NonCompositeField>
   )
 }

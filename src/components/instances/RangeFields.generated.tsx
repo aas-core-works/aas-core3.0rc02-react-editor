@@ -11,10 +11,15 @@
 
 import * as aas from "@aas-core-works/aas-core3.0rc02-typescript";
 import * as React from "react";
+import * as valtio from "valtio";
 
-import * as fields from '../fields';
-import * as help from './help.generated';
-import * as newinstancing from '../../newinstancing.generated';
+import * as enhancing from "../../enhancing.generated";
+import * as fields from "../fields";
+import * as help from "./help.generated";
+import * as model from "../../model";
+import * as newinstancing from "../../newinstancing.generated";
+import * as verification from "../../verification";
+import * as widgets from "../widgets";
 
 export function RangeFields(
   props: {
@@ -22,8 +27,109 @@ export function RangeFields(
     instance: aas.types.Range,
   }
 ) {
+  const [instanceErrors, setInstanceErrors] = React.useState<
+    Array<enhancing.TimestampedError> | null>(null);
+
+  const [errorsForCategory, setErrorsForCategory] = React.useState<
+    Array<enhancing.TimestampedError> | null>(null);
+
+  const [errorsForIdShort, setErrorsForIdShort] = React.useState<
+    Array<enhancing.TimestampedError> | null>(null);
+
+  const [errorsForChecksum, setErrorsForChecksum] = React.useState<
+    Array<enhancing.TimestampedError> | null>(null);
+
+  const [errorsForKind, setErrorsForKind] = React.useState<
+    Array<enhancing.TimestampedError> | null>(null);
+
+  const [errorsForValueType, setErrorsForValueType] = React.useState<
+    Array<enhancing.TimestampedError> | null>(null);
+
+  const [errorsForMin, setErrorsForMin] = React.useState<
+    Array<enhancing.TimestampedError> | null>(null);
+
+  const [errorsForMax, setErrorsForMax] = React.useState<
+    Array<enhancing.TimestampedError> | null>(null);
+
+  const snapErrorSetVersioning = valtio.useSnapshot(
+    model.getErrorSet(props.instance).versioning
+  );
+
+  React.useEffect(
+    () => {
+      const [
+        anotherInstanceErrors,
+        errorsByProperty
+      ] = verification.categorizeInstanceErrors(
+        model.getErrorSet(props.instance)
+      );
+
+      setInstanceErrors(anotherInstanceErrors);
+
+      const anotherErrorsForCategory =
+        errorsByProperty.get("category");
+      setErrorsForCategory(
+        anotherErrorsForCategory === undefined
+          ? null
+          : anotherErrorsForCategory
+      );
+
+      const anotherErrorsForIdShort =
+        errorsByProperty.get("idShort");
+      setErrorsForIdShort(
+        anotherErrorsForIdShort === undefined
+          ? null
+          : anotherErrorsForIdShort
+      );
+
+      const anotherErrorsForChecksum =
+        errorsByProperty.get("checksum");
+      setErrorsForChecksum(
+        anotherErrorsForChecksum === undefined
+          ? null
+          : anotherErrorsForChecksum
+      );
+
+      const anotherErrorsForKind =
+        errorsByProperty.get("kind");
+      setErrorsForKind(
+        anotherErrorsForKind === undefined
+          ? null
+          : anotherErrorsForKind
+      );
+
+      const anotherErrorsForValueType =
+        errorsByProperty.get("valueType");
+      setErrorsForValueType(
+        anotherErrorsForValueType === undefined
+          ? null
+          : anotherErrorsForValueType
+      );
+
+      const anotherErrorsForMin =
+        errorsByProperty.get("min");
+      setErrorsForMin(
+        anotherErrorsForMin === undefined
+          ? null
+          : anotherErrorsForMin
+      );
+
+      const anotherErrorsForMax =
+        errorsByProperty.get("max");
+      setErrorsForMax(
+        anotherErrorsForMax === undefined
+          ? null
+          : anotherErrorsForMax
+      );
+    },
+    [
+      snapErrorSetVersioning,
+      props.instance
+    ]
+  );
   return (
     <>
+    <widgets.LocalErrors errors={instanceErrors} />
       <fields.ListFieldOptional<aas.types.Extension>
         label="Extensions"
         helpUrl={
@@ -58,6 +164,7 @@ export function RangeFields(
             props.instance.category = value;
           }
         }
+        errors={errorsForCategory}
       />
 
       <fields.TextFieldOptional
@@ -71,6 +178,7 @@ export function RangeFields(
             props.instance.idShort = value;
           }
         }
+        errors={errorsForIdShort}
       />
 
       <fields.ListFieldOptional<aas.types.LangString>
@@ -130,6 +238,7 @@ export function RangeFields(
             props.instance.checksum = value;
           }
         }
+        errors={errorsForChecksum}
       />
 
       <fields.EnumerationFieldOptional
@@ -145,6 +254,7 @@ export function RangeFields(
             props.instance.kind = value;
           }
         }
+        errors={errorsForKind}
       />
 
       <fields.EmbeddedInstanceOptional<aas.types.Reference>
@@ -252,6 +362,7 @@ export function RangeFields(
             props.instance.valueType = value;
           }
         }
+        errors={errorsForValueType}
       />
 
       <fields.TextFieldOptional
@@ -265,6 +376,7 @@ export function RangeFields(
             props.instance.min = value;
           }
         }
+        errors={errorsForMin}
       />
 
       <fields.TextFieldOptional
@@ -278,6 +390,7 @@ export function RangeFields(
             props.instance.max = value;
           }
         }
+        errors={errorsForMax}
       />
     </>
   )

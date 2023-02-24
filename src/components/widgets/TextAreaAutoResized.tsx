@@ -1,7 +1,6 @@
 import * as React from "react";
 
 export function TextAreaAutoResized(props: {
-  id: string,
   content: string,
   onChange: (content: string) => void
 }) {
@@ -37,7 +36,6 @@ export function TextAreaAutoResized(props: {
       rows={1}
       style={{resize: "none", minHeight: "1.1em"}}
       ref={textAreaRef}
-      id={props.id}
       value={props.content}
       onChange={
         (event) => {

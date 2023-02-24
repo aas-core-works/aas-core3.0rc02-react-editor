@@ -54,46 +54,71 @@ export class TimestampedError {
 
     return result;
   }
+
+  relativePathFromInstanceAsString(): string {
+    if (this.relativePathFromInstance.length === 0) {
+      return "";
+    }
+
+    // NOTE (2023-02-10):
+    // See: https://stackoverflow.com/questions/16696632/most-efficient-way-to-concatenate-strings-in-javascript
+    // for string concatenation.
+    let result = "";
+
+    for (const segment of this.relativePathFromInstance) {
+      if (typeof segment === "string") {
+        result += `.${segment}`;
+      } else {
+        result += `[${segment}]`;
+      }
+    }
+
+    return result;
+  }
 }
 
 export class VersionedSet<T> {
-  private readonly content = new Set<T>();
-  private readonly versioning = valtio.proxy({ version: 0 });
+  private readonly _content = new Set<T>();
+  private readonly _versioning = valtio.proxy({ version: 0 });
 
   *[Symbol.iterator]() {
-    yield* this.content;
+    yield* this._content;
   }
 
   add(item: T) {
     let bumpVersion = false;
-    if (!this.content.has(item)) {
-      this.content.add(item);
+    if (!this._content.has(item)) {
+      this._content.add(item);
       bumpVersion = true;
     }
 
     if (bumpVersion) {
-      this.versioning.version++;
+      this._versioning.version++;
     }
   }
 
   delete(item: T) {
-    const bumpVersion = this.content.delete(item);
+    const bumpVersion = this._content.delete(item);
     if (bumpVersion) {
-      this.versioning.version++;
+      this._versioning.version++;
     }
   }
 
   clear() {
-    if (this.content.size === 0) {
+    if (this._content.size === 0) {
       return;
     }
 
-    this.content.clear();
-    this.versioning.version++;
+    this._content.clear();
+    this._versioning.version++;
   }
 
   public get size() {
-    return this.content.size;
+    return this._content.size;
+  }
+
+  public get versioning() {
+    return this._versioning;
   }
 }
 

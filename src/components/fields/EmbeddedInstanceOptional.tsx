@@ -2,6 +2,7 @@ import * as aas from "@aas-core-works/aas-core3.0rc02-typescript";
 import * as React from 'react';
 
 import * as fielding from "../instances/fielding.generated";
+import * as model from "../../model";
 import * as newinstancing from "../../newinstancing.generated";
 
 import {HelpLink} from "./HelpLink";
@@ -18,6 +19,29 @@ export function EmbeddedInstanceOptional<ClassT extends aas.types.Class>(
     setInstance: (instance: ClassT | null) => void
   }
 ) {
+  const errorSet = (props.instance !== null)
+    ? model.getErrorSet(props.instance)
+    : null;
+
+  const descendantsWithErrors = (props.instance !== null)
+    ? model.getDescendantsWithErrors(props.instance)
+    : null;
+
+  const [hasErrors, setHasErrors] = React.useState(false);
+
+  React.useEffect(
+    () => {
+      setHasErrors(
+        (errorSet !== null && errorSet.size > 0)
+        || (descendantsWithErrors !== null && descendantsWithErrors.size > 0)
+      )
+    },
+    [
+      errorSet?.versioning.version,
+      descendantsWithErrors?.versioning.version
+    ]
+  )
+
   const control = (
     (props.snapInstance === null)
       ?
@@ -27,6 +51,7 @@ export function EmbeddedInstanceOptional<ClassT extends aas.types.Class>(
             <button
               key={definition.label}
               onClick={() => {
+
                 props.setInstance(
                   definition.factory(
                     props.parent,
@@ -39,34 +64,28 @@ export function EmbeddedInstanceOptional<ClassT extends aas.types.Class>(
           )
         }
       )
-      : (
-        <button onClick={() => {
-          props.setInstance(null)
-        }}>🗑</button>
-      )
-  )
+      : (<button onClick={() => {
+        props.setInstance(null);
+      }}>🗑</button>)
+  );
 
   return (
     <li>
-      <span className="aas-label"
+      <span className={!hasErrors ? "aas-label" : "aas-label-with-errors"}
       >{props.label}<HelpLink helpUrl={props.helpUrl}/>:</span>
 
       <div className="aas-control">
         {control}
       </div>
 
-      {
-        (props.snapInstance !== null) && (
-          <ul className="aas-embedded-instance">
-            {
-              fielding.componentFor(
-                props.instance!,
-                props.snapInstance
-              )
-            }
-          </ul>
-        )
-      }
+      <ul className="aas-embedded-instance">
+        {
+          (props.instance !== null && props.snapInstance !== null) && (
+            fielding.componentFor(props.instance, props.snapInstance)
+          )
+        }
+      </ul>
+
     </li>
   )
 }

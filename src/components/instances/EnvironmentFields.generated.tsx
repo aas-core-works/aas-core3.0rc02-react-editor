@@ -11,10 +11,15 @@
 
 import * as aas from "@aas-core-works/aas-core3.0rc02-typescript";
 import * as React from "react";
+import * as valtio from "valtio";
 
-import * as fields from '../fields';
-import * as help from './help.generated';
-import * as newinstancing from '../../newinstancing.generated';
+import * as enhancing from "../../enhancing.generated";
+import * as fields from "../fields";
+import * as help from "./help.generated";
+import * as model from "../../model";
+import * as newinstancing from "../../newinstancing.generated";
+import * as verification from "../../verification";
+import * as widgets from "../widgets";
 
 export function EnvironmentFields(
   props: {
@@ -22,8 +27,32 @@ export function EnvironmentFields(
     instance: aas.types.Environment,
   }
 ) {
+  const [instanceErrors, setInstanceErrors] = React.useState<
+    Array<enhancing.TimestampedError> | null>(null);
+
+  const snapErrorSetVersioning = valtio.useSnapshot(
+    model.getErrorSet(props.instance).versioning
+  );
+
+  React.useEffect(
+    () => {
+      const [
+        anotherInstanceErrors,
+        _
+      ] = verification.categorizeInstanceErrors(
+        model.getErrorSet(props.instance)
+      );
+
+      setInstanceErrors(anotherInstanceErrors);
+    },
+    [
+      snapErrorSetVersioning,
+      props.instance
+    ]
+  );
   return (
     <>
+    <widgets.LocalErrors errors={instanceErrors} />
       <fields.ListFieldOptional<aas.types.AssetAdministrationShell>
         label="Asset administration shells"
         helpUrl={

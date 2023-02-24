@@ -11,10 +11,15 @@
 
 import * as aas from "@aas-core-works/aas-core3.0rc02-typescript";
 import * as React from "react";
+import * as valtio from "valtio";
 
-import * as fields from '../fields';
-import * as help from './help.generated';
-import * as newinstancing from '../../newinstancing.generated';
+import * as enhancing from "../../enhancing.generated";
+import * as fields from "../fields";
+import * as help from "./help.generated";
+import * as model from "../../model";
+import * as newinstancing from "../../newinstancing.generated";
+import * as verification from "../../verification";
+import * as widgets from "../widgets";
 
 export function DataSpecificationIec61360Fields(
   props: {
@@ -22,8 +27,109 @@ export function DataSpecificationIec61360Fields(
     instance: aas.types.DataSpecificationIec61360,
   }
 ) {
+  const [instanceErrors, setInstanceErrors] = React.useState<
+    Array<enhancing.TimestampedError> | null>(null);
+
+  const [errorsForUnit, setErrorsForUnit] = React.useState<
+    Array<enhancing.TimestampedError> | null>(null);
+
+  const [errorsForSourceOfDefinition, setErrorsForSourceOfDefinition] = React.useState<
+    Array<enhancing.TimestampedError> | null>(null);
+
+  const [errorsForSymbol, setErrorsForSymbol] = React.useState<
+    Array<enhancing.TimestampedError> | null>(null);
+
+  const [errorsForDataType, setErrorsForDataType] = React.useState<
+    Array<enhancing.TimestampedError> | null>(null);
+
+  const [errorsForValueFormat, setErrorsForValueFormat] = React.useState<
+    Array<enhancing.TimestampedError> | null>(null);
+
+  const [errorsForValue, setErrorsForValue] = React.useState<
+    Array<enhancing.TimestampedError> | null>(null);
+
+  const [errorsForLevelType, setErrorsForLevelType] = React.useState<
+    Array<enhancing.TimestampedError> | null>(null);
+
+  const snapErrorSetVersioning = valtio.useSnapshot(
+    model.getErrorSet(props.instance).versioning
+  );
+
+  React.useEffect(
+    () => {
+      const [
+        anotherInstanceErrors,
+        errorsByProperty
+      ] = verification.categorizeInstanceErrors(
+        model.getErrorSet(props.instance)
+      );
+
+      setInstanceErrors(anotherInstanceErrors);
+
+      const anotherErrorsForUnit =
+        errorsByProperty.get("unit");
+      setErrorsForUnit(
+        anotherErrorsForUnit === undefined
+          ? null
+          : anotherErrorsForUnit
+      );
+
+      const anotherErrorsForSourceOfDefinition =
+        errorsByProperty.get("sourceOfDefinition");
+      setErrorsForSourceOfDefinition(
+        anotherErrorsForSourceOfDefinition === undefined
+          ? null
+          : anotherErrorsForSourceOfDefinition
+      );
+
+      const anotherErrorsForSymbol =
+        errorsByProperty.get("symbol");
+      setErrorsForSymbol(
+        anotherErrorsForSymbol === undefined
+          ? null
+          : anotherErrorsForSymbol
+      );
+
+      const anotherErrorsForDataType =
+        errorsByProperty.get("dataType");
+      setErrorsForDataType(
+        anotherErrorsForDataType === undefined
+          ? null
+          : anotherErrorsForDataType
+      );
+
+      const anotherErrorsForValueFormat =
+        errorsByProperty.get("valueFormat");
+      setErrorsForValueFormat(
+        anotherErrorsForValueFormat === undefined
+          ? null
+          : anotherErrorsForValueFormat
+      );
+
+      const anotherErrorsForValue =
+        errorsByProperty.get("value");
+      setErrorsForValue(
+        anotherErrorsForValue === undefined
+          ? null
+          : anotherErrorsForValue
+      );
+
+      const anotherErrorsForLevelType =
+        errorsByProperty.get("levelType");
+      setErrorsForLevelType(
+        anotherErrorsForLevelType === undefined
+          ? null
+          : anotherErrorsForLevelType
+      );
+    },
+    [
+      snapErrorSetVersioning,
+      props.instance
+    ]
+  );
   return (
     <>
+    <widgets.LocalErrors errors={instanceErrors} />
       <fields.ListFieldRequired<aas.types.LangString>
         label="Preferred name"
         helpUrl={
@@ -81,6 +187,7 @@ export function DataSpecificationIec61360Fields(
             props.instance.unit = value;
           }
         }
+        errors={errorsForUnit}
       />
 
       <fields.EmbeddedInstanceOptional<aas.types.Reference>
@@ -117,6 +224,7 @@ export function DataSpecificationIec61360Fields(
             props.instance.sourceOfDefinition = value;
           }
         }
+        errors={errorsForSourceOfDefinition}
       />
 
       <fields.TextFieldOptional
@@ -130,6 +238,7 @@ export function DataSpecificationIec61360Fields(
             props.instance.symbol = value;
           }
         }
+        errors={errorsForSymbol}
       />
 
       <fields.EnumerationFieldOptional
@@ -145,6 +254,7 @@ export function DataSpecificationIec61360Fields(
             props.instance.dataType = value;
           }
         }
+        errors={errorsForDataType}
       />
 
       <fields.ListFieldOptional<aas.types.LangString>
@@ -181,6 +291,7 @@ export function DataSpecificationIec61360Fields(
             props.instance.valueFormat = value;
           }
         }
+        errors={errorsForValueFormat}
       />
 
       <fields.EmbeddedInstanceOptional<aas.types.ValueList>
@@ -217,6 +328,7 @@ export function DataSpecificationIec61360Fields(
             props.instance.value = value;
           }
         }
+        errors={errorsForValue}
       />
 
       <fields.EnumerationFieldOptional
@@ -232,6 +344,7 @@ export function DataSpecificationIec61360Fields(
             props.instance.levelType = value;
           }
         }
+        errors={errorsForLevelType}
       />
     </>
   )
