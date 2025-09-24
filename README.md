@@ -1,4 +1,9 @@
+**This software has been discontinued due to the lack of maintainers.
+This repository serves as an archive and inspiration for similar future projects.**
+
 # aas-core3.0rc02-react-editor
+
+
 
 Edit AAS files (serialized as JSON) without bells and whistles.
 
