@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2021 aas-core3.0rc02-react-editor AUTHORS
+#
+# SPDX-License-Identifier: MIT
+
 """Generate components of instance fields."""
 import io
 import pathlib
@@ -442,7 +446,7 @@ export function {component_name}(
 
     writer.write("\n")
 
-    path.write_text(writer.getvalue(), encoding="utf-8")
+    codegen.common.write_generated(path, writer.getvalue())
 
 
 def _generate_fielding(
@@ -559,7 +563,8 @@ def generate(
     root_help_url_literal = typescript_common.string_literal(
         f"https://aas-core-works.github.io/aas-core-meta/{model_id}"
     )
-    (instances_dir / "help.generated.ts").write_text(
+    codegen.common.write_generated(
+        instances_dir / "help.generated.ts",
         f"""\
 /**
  * Provide a global root URL for help links shared among the instance fields.
@@ -567,7 +572,6 @@ def generate(
 export const ROOT_URL =
 {I}{root_help_url_literal};
 """,
-        encoding="utf-8",
     )
 
     for cls in [
@@ -586,12 +590,12 @@ export const ROOT_URL =
         )
 
     fielding_code = _generate_fielding(symbol_table)
-    (instances_dir / "fielding.generated.ts").write_text(
-        fielding_code + "\n", encoding="utf-8"
+    codegen.common.write_generated(
+        instances_dir / "fielding.generated.ts", fielding_code + "\n"
     )
     exports.append('export * as fielding from "./fielding.generated";')
     exports.append('export * as help from "./help.generated";')
 
-    (instances_dir / "index.ts").write_text(
-        "\n".join(sorted(exports)) + "\n", encoding="utf-8"
+    codegen.common.write_generated(
+        instances_dir / "index.ts", "\n".join(sorted(exports)) + "\n"
     )

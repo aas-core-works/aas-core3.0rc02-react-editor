@@ -1,0 +1,49 @@
+# SPDX-FileCopyrightText: 2021 aas-core3.0rc02-react-editor AUTHORS
+#
+# SPDX-License-Identifier: MIT
+
+version = 1
+
+# Prose and metadata where a header would end up in the rendered output
+# (e.g., README shown on GitHub).
+[[annotations]]
+path = ["AUTHORS", "README.md", "codegen/README.md"]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2021 aas-core3.0rc02-react-editor AUTHORS"
+SPDX-License-Identifier = "MIT"
+
+# JSON and JSON-style configuration files which can not (or should not) carry
+# a comment. package-lock.json is maintained by npm.
+[[annotations]]
+path = ["package.json", "package-lock.json", ".eslintrc"]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2021 aas-core3.0rc02-react-editor AUTHORS"
+SPDX-License-Identifier = "MIT"
+
+# The TypeScript configuration is JSON and comes unchanged from the Vite
+# project template (create-vite), which is licensed under MIT by its own
+# authors.
+[[annotations]]
+path = ["tsconfig.json", "tsconfig.node.json"]
+precedence = "aggregate"
+SPDX-FileCopyrightText = [
+    "2019-present Yuxi (Evan) You and Vite contributors",
+    "2021 aas-core3.0rc02-react-editor AUTHORS",
+]
+SPDX-License-Identifier = "MIT"
+
+# codegen/setup.py reads every non-empty line of the requirements as
+# a requirement, so the file can not carry a comment.
+[[annotations]]
+path = "codegen/requirements.txt"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2021 aas-core3.0rc02-react-editor AUTHORS"
+SPDX-License-Identifier = "MIT"
+
+# The logos come unchanged from the Vite project template (create-vite),
+# which is licensed under MIT by its own authors.
+[[annotations]]
+path = ["src/assets/react.svg", "src/assets/vite.svg"]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2019-present Yuxi (Evan) You and Vite contributors"
+SPDX-License-Identifier = "MIT"

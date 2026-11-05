@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2021 aas-core3.0rc02-react-editor AUTHORS
+//
+// SPDX-License-Identifier: MIT
+
 /**
  * Define how titles are to be produced for instances of AAS classes.
  */

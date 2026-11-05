@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2021 aas-core3.0rc02-react-editor AUTHORS
+#
+# SPDX-License-Identifier: MIT
+
 """Provide common functionality to the generating scripts."""
 import os.path
 import pathlib
@@ -16,6 +20,20 @@ WARNING = Stripped(
 // DO NOT edit or append.
 //"""
 )
+
+# REUSE-IgnoreStart
+SPDX_HEADER = Stripped(
+    """\
+// SPDX-FileCopyrightText: 2021 aas-core3.0rc02-react-editor AUTHORS
+//
+// SPDX-License-Identifier: MIT"""
+)
+# REUSE-IgnoreEnd
+
+
+def write_generated(path: pathlib.Path, text: str) -> None:
+    """Write the generated ``text`` to ``path`` with the SPDX header prepended."""
+    path.write_text(SPDX_HEADER + "\n\n" + text, encoding="utf-8")
 
 
 @require(lambda identifier: len(identifier) > 0)

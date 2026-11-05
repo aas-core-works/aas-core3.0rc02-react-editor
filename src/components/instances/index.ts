@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2021 aas-core3.0rc02-react-editor AUTHORS
+//
+// SPDX-License-Identifier: MIT
+
 export * as fielding from "./fielding.generated";
 export * as help from "./help.generated";
 export { AdministrativeInformationFields } from "./AdministrativeInformationFields.generated";

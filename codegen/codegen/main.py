@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2021 aas-core3.0rc02-react-editor AUTHORS
+#
+# SPDX-License-Identifier: MIT
+
 """Generate the code based on the meta-model."""
 
 import argparse
@@ -46,24 +50,24 @@ def main() -> int:
         model_id=model_id,
     )
 
-    (codegen.common.REPO_ROOT / "src/emptory.generated.ts").write_text(
+    codegen.common.write_generated(
+        codegen.common.REPO_ROOT / "src/emptory.generated.ts",
         codegen.generate_emptory.generate(symbol_table=symbol_table) + "\n",
-        encoding="utf-8",
     )
 
-    (codegen.common.REPO_ROOT / "src/newinstancing.generated.ts").write_text(
+    codegen.common.write_generated(
+        codegen.common.REPO_ROOT / "src/newinstancing.generated.ts",
         codegen.generate_newinstancing.generate(symbol_table=symbol_table) + "\n",
-        encoding="utf-8",
     )
 
-    (codegen.common.REPO_ROOT / "src/titling.generated.ts").write_text(
+    codegen.common.write_generated(
+        codegen.common.REPO_ROOT / "src/titling.generated.ts",
         codegen.generate_titling.generate(symbol_table=symbol_table) + "\n",
-        encoding="utf-8",
     )
 
-    (codegen.common.REPO_ROOT / "src/enhancing.generated.ts").write_text(
+    codegen.common.write_generated(
+        codegen.common.REPO_ROOT / "src/enhancing.generated.ts",
         codegen.generate_enhancing.generate(symbol_table=symbol_table) + "\n",
-        encoding="utf-8",
     )
 
     return 0

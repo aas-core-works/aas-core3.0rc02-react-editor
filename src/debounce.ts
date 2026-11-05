@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2021 aas-core3.0rc02-react-editor AUTHORS
+//
+// SPDX-License-Identifier: MIT
+
 // Adapted from: https://gist.github.com/nmsdvid/8807205
 export function debounce<FuncT extends (...args: unknown[]) => unknown>(
   func: FuncT,
