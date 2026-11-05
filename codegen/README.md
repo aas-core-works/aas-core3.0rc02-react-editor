@@ -23,7 +23,7 @@ The pinned aas-core-codegen has requirement specifiers in its `setup.py` which c
 So first install older versions of these, and then install without build isolation, so that pip builds with them:
 
 ```
-python -m pip install --upgrade "pip<24.1" "setuptools<66" "wheel<0.40"
+python -m pip install --upgrade "pip<24.1" "setuptools<67" "wheel<0.40"
 pip3 install --no-build-isolation -e .
 ```
 
@@ -58,7 +58,7 @@ The pinned aas-core-codegen has requirement specifiers in its `setup.py` which c
 So first install older versions of these, and then install without build isolation, so that pip builds with them:
 
 ```
-python -m pip install --upgrade "pip<24.1" "setuptools<66" "wheel<0.40"
+python -m pip install --upgrade "pip<24.1" "setuptools<67" "wheel<0.40"
 pip3 install --no-build-isolation -e .[dev]
 ```
 
