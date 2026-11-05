@@ -23,10 +23,15 @@ jobs:
           python-version: ${{ matrix.python-version }}
 
       - name: Install dependencies
+        # NOTE (aaronzi, 2026-11-05):
+        # The pinned aas-core-codegen (18ee84f) has specifiers like `pydocstyle>=2.1.1<3`
+        # in its setup.py. pip >= 24.1, setuptools >= 66 and wheel >= 0.40 reject them.
+        # We cap these three and build without isolation, so that pip builds the package
+        # with the capped setuptools and wheel instead of fetching the latest ones.
         run: |
-          python3 -m pip install --upgrade pip
+          python3 -m pip install --upgrade "pip<24.1" "setuptools<66" "wheel<0.40"
           pip3 install --upgrade coveralls
-          pip3 install -e .[dev]
+          pip3 install --no-build-isolation -e .[dev]
         working-directory: codegen
 
       - name: Run checks
