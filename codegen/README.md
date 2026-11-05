@@ -18,10 +18,13 @@ python -m venv venv
 source venv/bin/activate
 ```
 
-Install the dependencies:
+Install the dependencies.
+The pinned aas-core-codegen has requirement specifiers in its `setup.py` which current pip, setuptools and wheel reject.
+So first install older versions of these, and then install without build isolation, so that pip builds with them:
 
 ```
-pip3 install -e .
+python -m pip install --upgrade "pip<24.1" "setuptools<67" "wheel<0.40"
+pip3 install --no-build-isolation -e .
 ```
 
 Run the main script:
@@ -50,10 +53,13 @@ python -m venv venv
 source venv/bin/activate
 ```
 
-Install the development dependencies:
+Install the development dependencies.
+The pinned aas-core-codegen has requirement specifiers in its `setup.py` which current pip, setuptools and wheel reject.
+So first install older versions of these, and then install without build isolation, so that pip builds with them:
 
 ```
-pip3 install -e .[dev]
+python -m pip install --upgrade "pip<24.1" "setuptools<67" "wheel<0.40"
+pip3 install --no-build-isolation -e .[dev]
 ```
 
 Develop.
