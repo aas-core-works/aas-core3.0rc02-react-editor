@@ -39,11 +39,3 @@ path = "codegen/requirements.txt"
 precedence = "aggregate"
 SPDX-FileCopyrightText = "2021 aas-core3.0rc02-react-editor AUTHORS"
 SPDX-License-Identifier = "MIT"
-
-# The logos come unchanged from the Vite project template (create-vite),
-# which is licensed under MIT by its own authors.
-[[annotations]]
-path = ["src/assets/react.svg", "src/assets/vite.svg"]
-precedence = "aggregate"
-SPDX-FileCopyrightText = "2019-present Yuxi (Evan) You and Vite contributors"
-SPDX-License-Identifier = "MIT"
