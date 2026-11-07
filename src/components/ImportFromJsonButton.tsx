@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2021 aas-core3.0rc02-react-editor AUTHORS
+//
+// SPDX-License-Identifier: MIT
+
 import * as aas from "@aas-core-works/aas-core3.0rc02-typescript";
 import * as React from 'react'
 
